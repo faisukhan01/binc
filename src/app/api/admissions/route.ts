@@ -58,7 +58,11 @@ export async function POST(req: NextRequest) {
             city: data.city,
             isWelfare: data.isWelfare ?? false,
             message: data.message || null,
+            events: {
+              create: { status: "PENDING" }, // first entry of the applicant's status history
+            },
           },
+          include: { events: { orderBy: { createdAt: "asc" } } },
         });
 
         return NextResponse.json(

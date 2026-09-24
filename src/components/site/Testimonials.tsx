@@ -1,20 +1,107 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
+import { BadgeCheck, ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
 import { TESTIMONIALS } from "@/lib/site-data";
 import { SectionHeading } from "./Reveal";
 import { cn } from "@/lib/utils";
 
+interface LiveTestimonial {
+  id: string;
+  name: string;
+  program: string;
+  quote: string;
+  rating: number;
+  photoUrl: string | null;
+  pinned: boolean;
+  createdAt: string;
+}
+
+interface DisplayItem {
+  id: string;
+  name: string;
+  program: string;
+  quote: string;
+  rating: number;
+  photoUrl: string | null;
+  verified: boolean;
+  live: boolean;
+}
+
+/** Gradient per name so initials avatars stay visually varied but deterministic */
+const AVATAR_TONES = [
+  "from-navy-700 to-navy-950",
+  "from-brand-red to-red-800",
+  "from-welfare-600 to-welfare-800",
+  "from-gold-500 to-gold-700",
+  "from-navy-500 to-brand-red",
+];
+
+function initials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase())
+    .join("");
+}
+
+function toneFor(name: string): string {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return AVATAR_TONES[h % AVATAR_TONES.length];
+}
+
 export function Testimonials() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [live, setLive] = useState<LiveTestimonial[] | null>(null);
 
-  const next = useCallback(() => setIndex((i) => (i + 1) % TESTIMONIALS.length), []);
+  const load = useCallback(() => {
+    fetch("/api/testimonials")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("failed"))))
+      .then((d) => setLive(d.testimonials ?? []))
+      .catch(() => setLive([]));
+  }, []);
+
+  useEffect(() => {
+    load();
+    // Live refresh when staff publish/delete from the console on this page
+    window.addEventListener("binc:testimonials-changed", load);
+    return () => window.removeEventListener("binc:testimonials-changed", load);
+  }, [load]);
+
+  // Staff-published testimonials take priority; curated fallback keeps the section full
+  const items: DisplayItem[] = useMemo(() => {
+    if (live && live.length > 0) {
+      return live.map((t) => ({
+        id: t.id,
+        name: t.name,
+        program: t.program,
+        quote: t.quote,
+        rating: t.rating,
+        photoUrl: t.photoUrl,
+        verified: true,
+        live: true,
+      }));
+    }
+    return TESTIMONIALS.map((t, i) => ({
+      id: `curated-${i}`,
+      name: t.name,
+      program: t.program,
+      quote: t.quote,
+      rating: t.rating,
+      photoUrl: null,
+      verified: false,
+      live: false,
+    }));
+  }, [live]);
+
+  const next = useCallback(() => setIndex((i) => (i + 1) % items.length), [items.length]);
   const prev = useCallback(
-    () => setIndex((i) => (i - 1 + TESTIMONIALS.length) % TESTIMONIALS.length),
-    []
+    () => setIndex((i) => (i - 1 + items.length) % items.length),
+    [items.length]
   );
 
   useEffect(() => {
@@ -23,7 +110,9 @@ export function Testimonials() {
     return () => clearInterval(t);
   }, [next, paused]);
 
-  const item = TESTIMONIALS[index];
+  // Clamp during render (list may shrink when staff delete from the console)
+  const activeIndex = Math.min(index, items.length - 1);
+  const item = items[activeIndex];
 
   return (
     <section
@@ -54,10 +143,10 @@ export function Testimonials() {
             className="absolute -top-6 left-1/2 size-20 -translate-x-1/2 text-navy-100"
             aria-hidden
           />
-          <div className="relative min-h-[280px] sm:min-h-[240px]">
+          <div className="relative min-h-[300px] sm:min-h-[250px]">
             <AnimatePresence mode="wait">
               <motion.figure
-                key={index}
+                key={item.id}
                 initial={{ opacity: 0, y: 28, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -20, scale: 0.98 }}
@@ -72,9 +161,40 @@ export function Testimonials() {
                 <blockquote className="mx-auto mt-5 max-w-2xl font-display text-lg leading-relaxed text-navy-900 sm:text-xl">
                   “{item.quote}”
                 </blockquote>
-                <figcaption className="mt-6">
-                  <p className="font-bold text-navy-950">{item.name}</p>
-                  <p className="mt-0.5 text-sm font-semibold text-brand-red">{item.program}</p>
+                <figcaption className="mt-6 flex items-center justify-center gap-3.5">
+                  {item.photoUrl ? (
+                    <img
+                      src={item.photoUrl}
+                      alt={`Photo of ${item.name}`}
+                      className="size-12 rounded-full object-cover ring-2 ring-gold-400/60"
+                    />
+                  ) : (
+                    <span
+                      aria-hidden
+                      className={cn(
+                        "grid size-12 shrink-0 place-items-center rounded-full bg-gradient-to-br font-display text-sm font-black text-white shadow-md ring-2 ring-white",
+                        toneFor(item.name)
+                      )}
+                    >
+                      {initials(item.name)}
+                    </span>
+                  )}
+                  <span className="text-left">
+                    <span className="flex items-center gap-1.5 font-bold text-navy-950">
+                      {item.name}
+                      {item.verified && (
+                        <span
+                          className="inline-flex items-center gap-1 rounded-full bg-welfare-500/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-welfare-700 ring-1 ring-welfare-500/30"
+                          title="Published by the admissions office"
+                        >
+                          <BadgeCheck className="size-3" /> Verified
+                        </span>
+                      )}
+                    </span>
+                    <span className="mt-0.5 block text-sm font-semibold text-brand-red">
+                      {item.program}
+                    </span>
+                  </span>
                 </figcaption>
               </motion.figure>
             </AnimatePresence>
@@ -90,16 +210,16 @@ export function Testimonials() {
               <ChevronLeft className="size-5" />
             </button>
             <div className="flex gap-2" role="tablist" aria-label="Testimonial selector">
-              {TESTIMONIALS.map((_, i) => (
+              {items.map((t, i) => (
                 <button
-                  key={i}
+                  key={t.id}
                   role="tab"
-                  aria-selected={i === index}
+                  aria-selected={i === activeIndex}
                   aria-label={`Show testimonial ${i + 1}`}
                   onClick={() => setIndex(i)}
                   className={cn(
                     "h-2.5 rounded-full transition-all duration-300",
-                    i === index
+                    i === activeIndex
                       ? "w-8 bg-gradient-to-r from-brand-red to-gold-500"
                       : "w-2.5 bg-navy-200 hover:bg-navy-300"
                   )}

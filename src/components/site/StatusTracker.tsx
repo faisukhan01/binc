@@ -23,6 +23,7 @@ interface TrackedApp {
   program: string;
   status: string;
   createdAt: string;
+  events?: { status: string; createdAt: string }[];
 }
 
 const STEPS = [
@@ -35,6 +36,13 @@ function statusIndex(status: string) {
   const i = STEPS.findIndex((s) => s.key === status.toUpperCase());
   return i === -1 ? 0 : i;
 }
+
+const fmtDate = (iso: string) =>
+  new Date(iso).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 
 export function StatusTracker() {
   const [code, setCode] = useState("");
@@ -63,6 +71,11 @@ export function StatusTracker() {
 
   const current = result ? statusIndex(result.status) : -1;
   const rejected = result?.status.toUpperCase() === "REJECTED";
+  const events = result?.events ?? [];
+  const eventDate = (status: string) => {
+    const ev = [...events].reverse().find((e) => e.status === status);
+    return ev ? fmtDate(ev.createdAt) : null;
+  };
 
   return (
     <Reveal delay={0.05}>
@@ -205,6 +218,12 @@ export function StatusTracker() {
                             </span>
                           )}
                         </p>
+                        {done && eventDate(step.key) && (
+                          <p className="mt-0.5 inline-flex items-center gap-1 rounded-md bg-welfare-500/8 px-1.5 py-0.5 font-mono text-[10.5px] font-bold text-welfare-700">
+                            <BadgeCheck className="size-3" />
+                            {eventDate(step.key)}
+                          </p>
+                        )}
                         <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
                           {rejected && isCurrent
                             ? "Unfortunately this application was not approved. Contact admissions for guidance."

@@ -5,7 +5,7 @@ import { PrismaClient } from "@prisma/client";
  * Bump PRISMA_TAG whenever prisma/schema.prisma changes + `prisma generate`
  * re-runs, so a stale globalThis client (missing new models) is never reused.
  */
-const PRISMA_TAG = "v2-announcement";
+const PRISMA_TAG = "v3-testimonials-events";
 
 const g = globalThis as unknown as {
   __prisma?: PrismaClient;

@@ -165,7 +165,7 @@ export async function PATCH(req: NextRequest) {
 
     const existing = await db.admission.findUnique({
       where: { trackingCode: parsed.data.code },
-      select: { id: true },
+      select: { id: true, status: true },
     });
     if (!existing) {
       return NextResponse.json({ error: "Application not found" }, { status: 404 });
@@ -173,7 +173,13 @@ export async function PATCH(req: NextRequest) {
 
     const updated = await db.admission.update({
       where: { trackingCode: parsed.data.code },
-      data: { status: parsed.data.status },
+      data: {
+        status: parsed.data.status,
+        // Append to the applicant's status history when the status actually changes
+        ...(existing.status !== parsed.data.status
+          ? { events: { create: { status: parsed.data.status } } }
+          : {}),
+      },
       select: { trackingCode: true, status: true },
     });
 

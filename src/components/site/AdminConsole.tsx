@@ -13,13 +13,17 @@ import {
   LogOut,
   Megaphone,
   Newspaper,
+  Pencil,
   Pin,
   Plus,
+  Quote,
   RefreshCw,
   Search,
   ShieldCheck,
+  Star,
   Trash2,
   Users,
+  X,
   XCircle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -42,6 +46,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 interface AdminApplication {
   id: string;
@@ -70,6 +75,17 @@ interface AnnouncementItem {
   title: string;
   body: string;
   tag: string;
+  pinned: boolean;
+  createdAt: string;
+}
+
+interface TestimonialItem {
+  id: string;
+  name: string;
+  program: string;
+  quote: string;
+  rating: number;
+  photoUrl: string | null;
   pinned: boolean;
   createdAt: string;
 }
@@ -106,7 +122,7 @@ export function AdminConsole() {
   const [query, setQuery] = useState("");
   const [savingCode, setSavingCode] = useState<string | null>(null);
   const [booted, setBooted] = useState(false);
-  const [tab, setTab] = useState<"applications" | "announcements">("applications");
+  const [tab, setTab] = useState<"applications" | "announcements" | "testimonials">("applications");
   const [announcements, setAnnouncements] = useState<AnnouncementItem[]>([]);
   const [annLoading, setAnnLoading] = useState(false);
   const [annTitle, setAnnTitle] = useState("");
@@ -115,6 +131,17 @@ export function AdminConsole() {
   const [annPinned, setAnnPinned] = useState(false);
   const [annSaving, setAnnSaving] = useState(false);
   const [annError, setAnnError] = useState<string | null>(null);
+  const [annEditingId, setAnnEditingId] = useState<string | null>(null);
+  const [testimonials, setTestimonials] = useState<TestimonialItem[]>([]);
+  const [tstLoading, setTstLoading] = useState(false);
+  const [tstName, setTstName] = useState("");
+  const [tstProgram, setTstProgram] = useState("");
+  const [tstQuote, setTstQuote] = useState("");
+  const [tstRating, setTstRating] = useState(5);
+  const [tstPhoto, setTstPhoto] = useState("");
+  const [tstPinned, setTstPinned] = useState(false);
+  const [tstSaving, setTstSaving] = useState(false);
+  const [tstError, setTstError] = useState<string | null>(null);
 
   // Open via footer event
   useEffect(() => {
@@ -150,6 +177,7 @@ export function AdminConsole() {
         setByProgram(data.byProgram ?? []);
         setAuthed(true);
         void loadAnnouncements();
+        void loadTestimonials();
       } catch {
         setError("Network error — please try again");
       } finally {
@@ -216,6 +244,7 @@ export function AdminConsole() {
     setStats(null);
     setByProgram([]);
     setAnnouncements([]);
+    setTestimonials([]);
     setTab("applications");
     setError(null);
   };
@@ -231,31 +260,79 @@ export function AdminConsole() {
     }
   }, []);
 
-  const createAnnouncement = useCallback(async () => {
+  const loadTestimonials = useCallback(async () => {
+    setTstLoading(true);
+    try {
+      const res = await fetch("/api/testimonials");
+      const data = await res.json();
+      if (res.ok) setTestimonials(data.testimonials ?? []);
+    } finally {
+      setTstLoading(false);
+    }
+  }, []);
+
+  /** Public sections on this page subscribe to these and refresh instantly */
+  const notifySite = useCallback((name: string) => {
+    window.dispatchEvent(new CustomEvent(name));
+  }, []);
+
+  const resetAnnForm = useCallback(() => {
+    setAnnTitle("");
+    setAnnBody("");
+    setAnnTag("Notice");
+    setAnnPinned(false);
+    setAnnEditingId(null);
+  }, []);
+
+  const startEditAnnouncement = useCallback((a: AnnouncementItem) => {
+    setAnnEditingId(a.id);
+    setAnnTitle(a.title);
+    setAnnBody(a.body);
+    setAnnTag(a.tag);
+    setAnnPinned(a.pinned);
+    setAnnError(null);
+  }, []);
+
+  const saveAnnouncement = useCallback(async () => {
     setAnnSaving(true);
     setAnnError(null);
     try {
+      const editing = Boolean(annEditingId);
       const res = await fetch("/api/announcements", {
-        method: "POST",
+        method: editing ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ adminKey, title: annTitle, body: annBody, tag: annTag, pinned: annPinned }),
+        body: JSON.stringify({
+          adminKey,
+          ...(editing ? { id: annEditingId } : {}),
+          title: annTitle,
+          body: annBody,
+          tag: annTag,
+          pinned: annPinned,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
-        setAnnError(data.error || "Could not publish announcement");
+        setAnnError(data.error || "Could not save announcement");
         return;
       }
-      setAnnouncements((list) => [data.announcement, ...list]);
-      setAnnTitle("");
-      setAnnBody("");
-      setAnnTag("Notice");
-      setAnnPinned(false);
+      setAnnouncements((list) => {
+        const next = editing
+          ? list.map((a) => (a.id === annEditingId ? (data.announcement as AnnouncementItem) : a))
+          : [data.announcement as AnnouncementItem, ...list];
+        // Re-sort: pinned first, then newest (mirrors the public API order)
+        return [...next].sort((x, y) => {
+          if (x.pinned !== y.pinned) return x.pinned ? -1 : 1;
+          return new Date(y.createdAt).getTime() - new Date(x.createdAt).getTime();
+        });
+      });
+      resetAnnForm();
+      notifySite("binc:announcements-changed");
     } catch {
       setAnnError("Network error — please try again");
     } finally {
       setAnnSaving(false);
     }
-  }, [adminKey, annTitle, annBody, annTag, annPinned]);
+  }, [adminKey, annTitle, annBody, annTag, annPinned, annEditingId, resetAnnForm, notifySite]);
 
   const deleteAnnouncement = useCallback(
     async (id: string) => {
@@ -263,12 +340,74 @@ export function AdminConsole() {
         const res = await fetch(`/api/announcements?adminKey=${encodeURIComponent(adminKey)}&id=${encodeURIComponent(id)}`, {
           method: "DELETE",
         });
-        if (res.ok) setAnnouncements((list) => list.filter((a) => a.id !== id));
+        if (res.ok) {
+          setAnnouncements((list) => list.filter((a) => a.id !== id));
+          if (annEditingId === id) resetAnnForm();
+          notifySite("binc:announcements-changed");
+        }
       } catch {
         /* keep row on failure */
       }
     },
-    [adminKey]
+    [adminKey, annEditingId, resetAnnForm, notifySite]
+  );
+
+  const resetTstForm = useCallback(() => {
+    setTstName("");
+    setTstProgram("");
+    setTstQuote("");
+    setTstRating(5);
+    setTstPhoto("");
+    setTstPinned(false);
+  }, []);
+
+  const createTestimonial = useCallback(async () => {
+    setTstSaving(true);
+    setTstError(null);
+    try {
+      const res = await fetch("/api/testimonials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          adminKey,
+          name: tstName,
+          program: tstProgram,
+          quote: tstQuote,
+          rating: tstRating,
+          photoUrl: tstPhoto.trim(),
+          pinned: tstPinned,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setTstError(data.error || "Could not publish testimonial");
+        return;
+      }
+      setTestimonials((list) => [data.testimonial as TestimonialItem, ...list]);
+      resetTstForm();
+      notifySite("binc:testimonials-changed");
+    } catch {
+      setTstError("Network error — please try again");
+    } finally {
+      setTstSaving(false);
+    }
+  }, [adminKey, tstName, tstProgram, tstQuote, tstRating, tstPhoto, tstPinned, resetTstForm, notifySite]);
+
+  const deleteTestimonial = useCallback(
+    async (id: string) => {
+      try {
+        const res = await fetch(`/api/testimonials?adminKey=${encodeURIComponent(adminKey)}&id=${encodeURIComponent(id)}`, {
+          method: "DELETE",
+        });
+        if (res.ok) {
+          setTestimonials((list) => list.filter((t) => t.id !== id));
+          notifySite("binc:testimonials-changed");
+        }
+      } catch {
+        /* keep row on failure */
+      }
+    },
+    [adminKey, notifySite]
   );
 
   /** Export the (filtered) application list as a CSV download */
@@ -378,26 +517,36 @@ export function AdminConsole() {
           <div className="px-5 py-5 sm:px-6">
             {/* Tabs */}
             <div
-              className="mb-5 grid grid-cols-2 gap-1 rounded-xl bg-navy-50 p-1"
+              className="mb-5 grid grid-cols-3 gap-1 rounded-xl bg-navy-50 p-1"
               role="tablist"
               aria-label="Console sections"
             >
               {([
-                { id: "applications", label: "Applications", icon: Users },
-                { id: "announcements", label: "Announcements", icon: Megaphone },
+                { id: "applications", label: "Applications", icon: Users, count: apps.length },
+                { id: "announcements", label: "Announcements", icon: Megaphone, count: announcements.length },
+                { id: "testimonials", label: "Voices", icon: Quote, count: testimonials.length },
               ] as const).map((t) => (
                 <button
                   key={t.id}
                   role="tab"
                   aria-selected={tab === t.id}
+                  aria-label={`${t.label} (${t.count})`}
                   onClick={() => setTab(t.id)}
-                  className={`inline-flex min-h-[40px] items-center justify-center gap-2 rounded-lg text-sm font-extrabold transition-all ${
+                  className={`inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-lg px-1 text-[13px] font-extrabold transition-all sm:gap-2 sm:text-sm ${
                     tab === t.id
                       ? "bg-white text-navy-900 shadow-sm"
                       : "text-muted-foreground hover:text-navy-800"
                   }`}
                 >
-                  <t.icon className="size-4" /> {t.label}
+                  <t.icon className="size-4 shrink-0" />
+                  <span className="hidden sm:inline">{t.label}</span>
+                  <span
+                    className={`ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-black leading-none ${
+                      tab === t.id ? "bg-navy-900 text-gold-400" : "bg-navy-100 text-navy-700"
+                    }`}
+                  >
+                    {t.count}
+                  </span>
                 </button>
               ))}
             </div>
@@ -589,14 +738,34 @@ export function AdminConsole() {
               Status changes reflect instantly on the applicant&apos;s tracking timeline.
             </p>
             </>
-            ) : (
+            ) : tab === "announcements" ? (
               /* ============ ANNOUNCEMENTS TAB ============ */
               <div>
-                {/* Compose */}
-                <div className="rounded-xl border border-border bg-navy-50/50 p-4">
-                  <p className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.2em] text-navy-800">
-                    <Newspaper className="size-4 text-brand-red" /> Publish to the website notice board
-                  </p>
+                {/* Compose / Edit */}
+                <div
+                  className={cn(
+                    "rounded-xl border p-4 transition-colors",
+                    annEditingId ? "border-gold-400/60 bg-gold-400/5" : "border-border bg-navy-50/50"
+                  )}
+                >
+                  {annEditingId ? (
+                    <div className="mb-3 flex items-center justify-between gap-2 rounded-lg bg-gold-400/15 px-3 py-2">
+                      <p className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.2em] text-gold-600">
+                        <Pencil className="size-3.5" /> Editing announcement
+                      </p>
+                      <button
+                        onClick={resetAnnForm}
+                        className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-extrabold text-gold-600 transition hover:bg-gold-400/20"
+                        aria-label="Cancel editing"
+                      >
+                        <X className="size-3.5" /> Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.2em] text-navy-800">
+                      <Newspaper className="size-4 text-brand-red" /> Publish to the website notice board
+                    </p>
+                  )}
                   <div className="mt-3 grid gap-3">
                     <div className="space-y-1.5">
                       <Label htmlFor="ann-title" className="text-xs font-bold">Title *</Label>
@@ -650,13 +819,22 @@ export function AdminConsole() {
                         </span>
                       </label>
                       <Button
-                        onClick={() => void createAnnouncement()}
+                        onClick={() => void saveAnnouncement()}
                         disabled={annSaving || annTitle.trim().length < 4 || annBody.trim().length < 10}
-                        className="mt-4 ml-auto min-h-[40px] rounded-xl bg-gradient-to-r from-navy-900 to-navy-800 px-5 text-sm font-extrabold text-white shadow-lg hover:shadow-xl disabled:opacity-60"
+                        className={cn(
+                          "mt-4 ml-auto min-h-[40px] rounded-xl px-5 text-sm font-extrabold text-white shadow-lg hover:shadow-xl disabled:opacity-60",
+                          annEditingId
+                            ? "bg-gradient-to-r from-gold-500 to-gold-600 !text-navy-950"
+                            : "bg-gradient-to-r from-navy-900 to-navy-800"
+                        )}
                       >
                         {annSaving ? (
                           <>
-                            <Loader2 className="size-4 animate-spin" /> Publishing…
+                            <Loader2 className="size-4 animate-spin" /> Saving…
+                          </>
+                        ) : annEditingId ? (
+                          <>
+                            <Pencil className="size-4" /> Save changes
                           </>
                         ) : (
                           <>
@@ -718,11 +896,215 @@ export function AdminConsole() {
                               <p className="mt-1 text-sm font-extrabold text-navy-900">{a.title}</p>
                               <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{a.body}</p>
                             </div>
+                            <div className="flex shrink-0 items-center gap-1.5 self-end sm:self-center">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => startEditAnnouncement(a)}
+                                aria-label={`Edit announcement: ${a.title}`}
+                                className="size-9 border-navy-200 text-navy-700 hover:bg-navy-900 hover:text-white"
+                              >
+                                <Pencil className="size-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => void deleteAnnouncement(a.id)}
+                                aria-label={`Delete announcement: ${a.title}`}
+                                className="size-9 border-brand-red/25 text-brand-red hover:bg-brand-red hover:text-white"
+                              >
+                                <Trash2 className="size-4" />
+                              </Button>
+                            </div>
+                          </motion.li>
+                        ))}
+                      </AnimatePresence>
+                    </ul>
+                  )}
+                </div>
+
+                <p className="mt-3 text-center text-[11px] text-muted-foreground">
+                  Announcements show under “Latest updates &amp; events” on the website — pinned items appear first.
+                </p>
+              </div>
+            ) : (
+              /* ============ TESTIMONIALS (STUDENT VOICES) TAB ============ */
+              <div>
+                {/* Compose */}
+                <div className="rounded-xl border border-border bg-navy-50/50 p-4">
+                  <p className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.2em] text-navy-800">
+                    <Quote className="size-4 text-brand-red" /> Publish a student testimonial
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Real student quotes appear in “Student Voices” with a verified badge.
+                  </p>
+                  <div className="mt-3 grid gap-3">
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="tst-name" className="text-xs font-bold">Student name *</Label>
+                        <Input
+                          id="tst-name"
+                          value={tstName}
+                          onChange={(e) => setTstName(e.target.value)}
+                          placeholder="e.g. Ayesha Khan"
+                          maxLength={80}
+                          className="rounded-xl text-sm"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="tst-program" className="text-xs font-bold">Program / Batch *</Label>
+                        <Input
+                          id="tst-program"
+                          value={tstProgram}
+                          onChange={(e) => setTstProgram(e.target.value)}
+                          placeholder="e.g. Pharm-D, Year 2"
+                          maxLength={80}
+                          className="rounded-xl text-sm"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="tst-quote" className="text-xs font-bold">
+                        Quote * <span className="font-medium text-muted-foreground">(min 20 characters)</span>
+                      </Label>
+                      <Textarea
+                        id="tst-quote"
+                        value={tstQuote}
+                        onChange={(e) => setTstQuote(e.target.value)}
+                        placeholder="What the student said about studying at Bright International College…"
+                        rows={3}
+                        maxLength={800}
+                        className="rounded-xl text-sm"
+                      />
+                    </div>
+                    <div className="flex flex-wrap items-end gap-3">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-bold">Rating</Label>
+                        <Select value={String(tstRating)} onValueChange={(v) => setTstRating(Number(v))}>
+                          <SelectTrigger className="h-9 w-[120px] rounded-lg text-xs font-bold" aria-label="Star rating">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[5, 4, 3, 2, 1].map((r) => (
+                              <SelectItem key={r} value={String(r)} className="text-xs font-bold">
+                                {r} star{r > 1 ? "s" : ""}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <label
+                        htmlFor="tst-pinned"
+                        className="flex cursor-pointer items-center gap-2 rounded-lg border border-gold-400/40 bg-gold-400/10 px-3 py-2"
+                      >
+                        <Checkbox
+                          id="tst-pinned"
+                          checked={tstPinned}
+                          onCheckedChange={(v) => setTstPinned(v === true)}
+                          className="size-4"
+                        />
+                        <span className="flex items-center gap-1.5 text-xs font-extrabold text-gold-600">
+                          <Pin className="size-3.5" /> Pin first
+                        </span>
+                      </label>
+                      <Button
+                        onClick={() => void createTestimonial()}
+                        disabled={
+                          tstSaving ||
+                          tstName.trim().length < 2 ||
+                          tstProgram.trim().length < 2 ||
+                          tstQuote.trim().length < 20
+                        }
+                        className="ml-auto min-h-[40px] rounded-xl bg-gradient-to-r from-navy-900 to-navy-800 px-5 text-sm font-extrabold text-white shadow-lg hover:shadow-xl disabled:opacity-60"
+                      >
+                        {tstSaving ? (
+                          <>
+                            <Loader2 className="size-4 animate-spin" /> Publishing…
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="size-4" /> Publish
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="tst-photo" className="text-xs font-bold">
+                        Photo URL{" "}
+                        <span className="font-medium text-muted-foreground">
+                          (optional — an initials avatar is used if empty)
+                        </span>
+                      </Label>
+                      <Input
+                        id="tst-photo"
+                        value={tstPhoto}
+                        onChange={(e) => setTstPhoto(e.target.value)}
+                        type="url"
+                        placeholder="https://…/student-photo.jpg"
+                        maxLength={500}
+                        className="rounded-xl text-sm"
+                      />
+                    </div>
+                    {tstError && (
+                      <p className="rounded-lg bg-brand-red/10 px-3 py-2 text-xs font-bold text-brand-red">{tstError}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* List */}
+                <div className="mt-4 max-h-[42vh] overflow-y-auto rounded-xl border border-border">
+                  {tstLoading ? (
+                    <div className="flex items-center justify-center gap-2 py-12 text-sm font-bold text-muted-foreground">
+                      <Loader2 className="size-4.5 animate-spin" /> Loading…
+                    </div>
+                  ) : testimonials.length === 0 ? (
+                    <div className="grid place-items-center gap-2 py-14 text-center">
+                      <Quote className="size-9 text-navy-200" />
+                      <p className="text-sm font-bold text-navy-900">No published testimonials yet</p>
+                      <p className="text-xs text-muted-foreground">
+                        Until you publish one, the website shows the college&apos;s curated starter quotes.
+                      </p>
+                    </div>
+                  ) : (
+                    <ul className="divide-y divide-border">
+                      <AnimatePresence initial={false}>
+                        {testimonials.map((t) => (
+                          <motion.li
+                            key={t.id}
+                            layout
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="flex items-start gap-3 p-4 transition-colors hover:bg-navy-50/60"
+                          >
+                            <span
+                              aria-hidden
+                              className="grid size-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-navy-700 to-navy-950 text-xs font-black text-white"
+                            >
+                              {t.name.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("")}
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <p className="text-sm font-extrabold text-navy-900">{t.name}</p>
+                                {t.pinned && (
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-gold-400/15 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-gold-600 ring-1 ring-gold-400/40">
+                                    <Pin className="size-3" /> Pinned
+                                  </span>
+                                )}
+                                <span className="flex items-center gap-0.5" aria-label={`${t.rating} stars`}>
+                                  {Array.from({ length: t.rating }).map((_, i) => (
+                                    <Star key={i} className="size-3 fill-gold-500 text-gold-500" />
+                                  ))}
+                                </span>
+                              </div>
+                              <p className="text-xs font-semibold text-brand-red">{t.program}</p>
+                              <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">“{t.quote}”</p>
+                            </div>
                             <Button
                               variant="outline"
                               size="icon"
-                              onClick={() => void deleteAnnouncement(a.id)}
-                              aria-label={`Delete announcement: ${a.title}`}
+                              onClick={() => void deleteTestimonial(t.id)}
+                              aria-label={`Delete testimonial from ${t.name}`}
                               className="size-9 shrink-0 border-brand-red/25 text-brand-red hover:bg-brand-red hover:text-white"
                             >
                               <Trash2 className="size-4" />
@@ -735,7 +1117,7 @@ export function AdminConsole() {
                 </div>
 
                 <p className="mt-3 text-center text-[11px] text-muted-foreground">
-                  Announcements show under “Latest updates &amp; events” on the website — pinned items appear first.
+                  Published testimonials replace the curated quotes in the “Student Voices” section instantly.
                 </p>
               </div>
             )}

@@ -8,8 +8,8 @@ datasource db {
 }
 
 model Admission {
-  id            String   @id @default(cuid())
-  trackingCode  String   @unique
+  id            String        @id @default(cuid())
+  trackingCode  String        @unique
   fullName      String
   fatherName    String
   email         String?
@@ -18,11 +18,12 @@ model Admission {
   qualification String
   lastMarks     String?
   city          String
-  isWelfare     Boolean  @default(false)
+  isWelfare     Boolean       @default(false)
   message       String?
-  status        String   @default("PENDING") // PENDING | CONTACTED | APPROVED | REJECTED
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  status        String        @default("PENDING") // PENDING | CONTACTED | APPROVED | REJECTED
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  events        StatusEvent[]
 }
 
 model Announcement {
@@ -32,4 +33,25 @@ model Announcement {
   tag       String   @default("Notice") // Notice | Event | Deadline | Result
   pinned    Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  program   String
+  quote     String
+  rating    Int      @default(5) // 1..5
+  photoUrl  String?
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model StatusEvent {
+  id          String    @id @default(cuid())
+  admissionId String
+  admission   Admission @relation(fields: [admissionId], references: [id], onDelete: Cascade)
+  status      String
+  createdAt   DateTime  @default(now())
+
+  @@index([admissionId])
 }

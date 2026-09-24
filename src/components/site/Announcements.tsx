@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { CalendarDays, Megaphone, Pin } from "lucide-react";
 import { Reveal, SectionHeading } from "./Reveal";
@@ -21,23 +21,39 @@ const TAG_STYLES: Record<string, { chip: string; dot: string }> = {
   Result: { chip: "bg-welfare-500/12 text-welfare-700 ring-welfare-500/30", dot: "bg-welfare-500" },
 };
 
+/** "just now" / "2d ago" / "3w ago" — compact relative time for notice cards */
+function relativeTime(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return `${days}d ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 5) return `${weeks}w ago`;
+  return `${Math.floor(days / 30)}mo ago`;
+}
+
+const FRESH_MS = 3 * 24 * 60 * 60 * 1000; // 3 days
+
 export function Announcements() {
   const [items, setItems] = useState<Announcement[] | null>(null);
 
-  useEffect(() => {
-    let alive = true;
+  const load = useCallback(() => {
     fetch("/api/announcements")
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("failed"))))
-      .then((d) => {
-        if (alive) setItems(d.announcements ?? []);
-      })
-      .catch(() => {
-        if (alive) setItems([]);
-      });
-    return () => {
-      alive = false;
-    };
+      .then((d) => setItems(d.announcements ?? []))
+      .catch(() => setItems([]));
   }, []);
+
+  useEffect(() => {
+    load();
+    // Live refresh when staff publish/edit/delete from the console on this page
+    window.addEventListener("binc:announcements-changed", load);
+    return () => window.removeEventListener("binc:announcements-changed", load);
+  }, [load]);
 
   // Section stays completely hidden until staff publish something
   if (!items || items.length === 0) return null;
@@ -65,6 +81,7 @@ export function Announcements() {
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {items.map((a, i) => {
             const tag = TAG_STYLES[a.tag] ?? TAG_STYLES.Notice;
+            const fresh = Date.now() - new Date(a.createdAt).getTime() < FRESH_MS;
             return (
               <Reveal key={a.id} delay={0.06 * i} className="h-full">
                 <motion.article
@@ -85,6 +102,15 @@ export function Announcements() {
                       <span className={`size-1.5 rounded-full ${tag.dot}`} />
                       {a.tag}
                     </span>
+                    {fresh && !a.pinned && (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-red px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-white shadow-sm shadow-brand-red/30">
+                        <span className="relative flex size-1.5">
+                          <span className="absolute inline-flex size-full animate-ping rounded-full bg-white opacity-75" />
+                          <span className="relative inline-flex size-1.5 rounded-full bg-white" />
+                        </span>
+                        New
+                      </span>
+                    )}
                   </div>
 
                   <h3 className="mt-3.5 font-display text-lg font-black leading-snug text-navy-950 transition-colors group-hover:text-brand-red">
@@ -101,6 +127,8 @@ export function Announcements() {
                       month: "short",
                       year: "numeric",
                     })}
+                    <span className="text-navy-400/70">·</span>
+                    <span className="normal-case tracking-normal">{relativeTime(a.createdAt)}</span>
                   </p>
                 </motion.article>
               </Reveal>

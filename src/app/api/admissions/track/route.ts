@@ -18,6 +18,10 @@ export async function GET(req: NextRequest) {
         program: true,
         status: true,
         createdAt: true,
+        events: {
+          orderBy: { createdAt: "asc" },
+          select: { status: true, createdAt: true },
+        },
       },
     });
 
