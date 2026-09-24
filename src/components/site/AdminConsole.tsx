@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   BadgeCheck,
   Clock3,
+  Download,
   GraduationCap,
   KeyRound,
   LockKeyhole,
@@ -43,10 +44,17 @@ interface AdminApplication {
   phone: string;
   program: string;
   qualification: string;
+  lastMarks: string | null;
   city: string;
   isWelfare: boolean;
   status: string;
+  message: string | null;
   createdAt: string;
+}
+
+interface ProgramCount {
+  program: string;
+  count: number;
 }
 
 interface AdminStats {
@@ -77,6 +85,7 @@ export function AdminConsole() {
   const [error, setError] = useState<string | null>(null);
   const [apps, setApps] = useState<AdminApplication[]>([]);
   const [stats, setStats] = useState<AdminStats | null>(null);
+  const [byProgram, setByProgram] = useState<ProgramCount[]>([]);
   const [query, setQuery] = useState("");
   const [savingCode, setSavingCode] = useState<string | null>(null);
   const [booted, setBooted] = useState(false);
@@ -112,6 +121,7 @@ export function AdminConsole() {
         setAdminKey(key);
         setApps(data.applications);
         setStats(data.stats);
+        setByProgram(data.byProgram ?? []);
         setAuthed(true);
       } catch {
         setError("Network error — please try again");
@@ -177,7 +187,32 @@ export function AdminConsole() {
     setAdminKey("");
     setApps([]);
     setStats(null);
+    setByProgram([]);
     setError(null);
+  };
+
+  /** Export the (filtered) application list as a CSV download */
+  const exportCsv = () => {
+    const esc = (v: unknown) => {
+      const s = String(v ?? "");
+      return /["\n,]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const header = [
+      "Tracking Code", "Full Name", "Father Name", "Phone", "Email", "Program",
+      "Qualification", "Last Marks", "City", "Welfare", "Status", "Applied On", "Message",
+    ];
+    const rows = filtered.map((a) => [
+      a.trackingCode, a.fullName, a.fatherName, a.phone, a.email ?? "", a.program,
+      a.qualification, a.lastMarks ?? "", a.city, a.isWelfare ? "Yes" : "No", a.status,
+      new Date(a.createdAt).toLocaleString("en-GB"), a.message ?? "",
+    ]);
+    const csv = "\uFEFF" + [header, ...rows].map((r) => r.map(esc).join(",")).join("\r\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `binc-admissions-fall26-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -285,6 +320,45 @@ export function AdminConsole() {
               ))}
             </div>
 
+            {/* Program distribution */}
+            {byProgram.length > 0 && (
+              <div className="mt-5 rounded-xl border border-border bg-navy-50/60 p-4">
+                <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-navy-800">
+                  Applications by program
+                </p>
+                <div className="mt-3 space-y-2.5">
+                  {byProgram.map((p) => {
+                    const pct = stats && stats.total > 0 ? Math.round((p.count / stats.total) * 100) : 0;
+                    return (
+                      <div key={p.program} className="flex items-center gap-3">
+                        <span className="w-20 shrink-0 truncate text-xs font-extrabold text-navy-900">
+                          {p.program}
+                        </span>
+                        <div
+                          className="h-2.5 flex-1 overflow-hidden rounded-full bg-navy-100"
+                          role="progressbar"
+                          aria-valuenow={pct}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-label={`${p.program}: ${p.count} applications (${pct}%)`}
+                        >
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.max(pct, 6)}%` }}
+                            transition={{ type: "spring", damping: 22, stiffness: 160 }}
+                            className="h-full rounded-full bg-gradient-to-r from-navy-800 via-navy-700 to-brand-red"
+                          />
+                        </div>
+                        <span className="w-14 shrink-0 text-right text-xs font-bold text-muted-foreground">
+                          {p.count} · {pct}%
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Toolbar */}
             <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="relative flex-1">
@@ -297,13 +371,23 @@ export function AdminConsole() {
                   className="h-11 rounded-xl pl-10 text-sm"
                 />
               </div>
-              <Button
-                variant="outline"
-                onClick={() => void login(adminKey)}
-                className="h-11 rounded-xl border-navy-200 px-4 text-sm font-bold text-navy-800 hover:bg-navy-50"
-              >
-                <RefreshCw className="size-4" /> Refresh
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={exportCsv}
+                  disabled={filtered.length === 0}
+                  className="h-11 flex-1 rounded-xl border-navy-200 px-4 text-sm font-bold text-navy-800 hover:bg-navy-50 sm:flex-none"
+                >
+                  <Download className="size-4" /> CSV
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => void login(adminKey)}
+                  className="h-11 flex-1 rounded-xl border-navy-200 px-4 text-sm font-bold text-navy-800 hover:bg-navy-50 sm:flex-none"
+                >
+                  <RefreshCw className="size-4" /> Refresh
+                </Button>
+              </div>
             </div>
 
             {/* List */}

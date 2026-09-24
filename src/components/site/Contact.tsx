@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -97,6 +97,23 @@ export function Contact() {
   const program = watch("program");
   const qualification = watch("qualification");
   const isWelfare = watch("isWelfare");
+
+  // Program cards / modal dispatch this event → pre-select the program in the form
+  useEffect(() => {
+    const onSelectProgram = (e: Event) => {
+      const detail = (e as CustomEvent<{ program?: string }>).detail;
+      const title = detail?.program;
+      if (!title) return;
+      setValue("program", title, { shouldValidate: true });
+      setSuccess(null);
+      toast({
+        title: `${title} selected 🎯`,
+        description: "Program pre-filled in the admission form — complete the rest to apply.",
+      });
+    };
+    window.addEventListener("binc:select-program", onSelectProgram);
+    return () => window.removeEventListener("binc:select-program", onSelectProgram);
+  }, [setValue]);
 
   async function onSubmit(values: FormValues) {
     try {

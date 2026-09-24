@@ -1,12 +1,16 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, BadgeCheck, Clock3 } from "lucide-react";
-import { PROGRAMS } from "@/lib/site-data";
+import { ArrowRight, BadgeCheck, Clock3, Info } from "lucide-react";
+import { PROGRAMS, type Program } from "@/lib/site-data";
 import { Reveal, SectionHeading } from "./Reveal";
+import { ProgramModal } from "./ProgramModal";
 
 export function Programs() {
+  const [active, setActive] = useState<Program | null>(null);
+
   return (
     <section id="programs" className="relative bg-navy-50/60 py-20 sm:py-28 overflow-hidden">
       <div
@@ -87,19 +91,31 @@ export function Programs() {
                     ))}
                   </div>
 
-                  <a
-                    href="#apply"
-                    className="group/btn mt-auto inline-flex min-h-[48px] items-center justify-between rounded-xl bg-navy-950 px-5 py-3 text-sm font-bold text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-brand-red hover:to-brand-redlight"
-                  >
-                    Apply for {p.title}
-                    <ArrowRight className="size-4 transition-transform duration-300 group-hover/btn:translate-x-1.5" />
-                  </a>
+                  <div className="mt-auto grid grid-cols-[1.3fr_1fr] gap-2">
+                    <a
+                      href="#apply"
+                      className="group/btn inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl bg-navy-950 px-4 py-3 text-sm font-bold text-white transition-all duration-300 hover:bg-gradient-to-r hover:from-brand-red hover:to-brand-redlight"
+                    >
+                      Apply for {p.title}
+                      <ArrowRight className="size-4 transition-transform duration-300 group-hover/btn:translate-x-1.5" />
+                    </a>
+                    <button
+                      onClick={() => setActive(p)}
+                      aria-haspopup="dialog"
+                      className="inline-flex min-h-[48px] items-center justify-center gap-1.5 rounded-xl border-2 border-navy-100 bg-white px-3 py-3 text-sm font-extrabold text-navy-800 transition-all duration-300 hover:border-gold-400 hover:bg-gold-300/15 hover:text-navy-950"
+                    >
+                      <Info className="size-4 text-brand-red" />
+                      Details
+                    </button>
+                  </div>
                 </div>
               </motion.article>
             </Reveal>
           ))}
         </div>
       </div>
+
+      <ProgramModal program={active} onClose={() => setActive(null)} />
     </section>
   );
 }

@@ -28,6 +28,9 @@ export interface Program {
   points: string[];
   careers: string[];
   accent: string; // tailwind gradient classes
+  overview: string;
+  eligibility: string[];
+  curriculum: { year: string; focus: string }[];
 }
 
 export const PROGRAMS: Program[] = [
@@ -46,6 +49,20 @@ export const PROGRAMS: Program[] = [
     ],
     careers: ["Community Pharmacist", "Hospital Pharmacist", "Pharma Industry", "Research"],
     accent: "from-navy-800 to-navy-950",
+    overview:
+      "Pharm-D is a five-year professional doctorate that trains you to become a licensed pharmacy professional — from the science behind medicines to hands-on patient care in hospitals and community pharmacies.",
+    eligibility: [
+      "Intermediate (FSc Pre-Medical) or equivalent qualification",
+      "Original academic documents (Matric & Intermediate)",
+      "CNIC / B-Form and recent passport-size photographs",
+    ],
+    curriculum: [
+      { year: "Year 1", focus: "Anatomy, physiology & pharmaceutical chemistry foundations" },
+      { year: "Year 2", focus: "Pharmacology & pharmaceutics — how drugs work and are formulated" },
+      { year: "Year 3", focus: "Pharmaceutical technology & medicinal chemistry" },
+      { year: "Year 4", focus: "Clinical, hospital & community pharmacy practice" },
+      { year: "Year 5", focus: "Clinical rotations, research project & professional internship" },
+    ],
   },
   {
     id: "dpt",
@@ -62,6 +79,20 @@ export const PROGRAMS: Program[] = [
     ],
     careers: ["Clinical DPT", "Sports Rehab", "Rehab Centers", "Private Practice"],
     accent: "from-brand-red to-navy-900",
+    overview:
+      "DPT is a five-year clinical doctorate focused on physical rehabilitation — you learn to assess, diagnose and treat movement disorders through evidence-based therapy in hospitals, sports settings and private practice.",
+    eligibility: [
+      "Intermediate (FSc Pre-Medical) or equivalent qualification",
+      "Original academic documents (Matric & Intermediate)",
+      "CNIC / B-Form and recent passport-size photographs",
+    ],
+    curriculum: [
+      { year: "Year 1", focus: "Basic medical sciences — anatomy, physiology & kinesiology" },
+      { year: "Year 2", focus: "Pathology, pharmacology & biomechanics" },
+      { year: "Year 3", focus: "Therapeutic exercise, electrotherapy & assessment skills" },
+      { year: "Year 4", focus: "Musculoskeletal, neuro & cardiopulmonary rehabilitation" },
+      { year: "Year 5", focus: "Supervised clinical internships & research project" },
+    ],
   },
   {
     id: "bscs",
@@ -78,6 +109,19 @@ export const PROGRAMS: Program[] = [
     ],
     careers: ["Software Engineer", "AI / Data Science", "Cyber Security", "Entrepreneurship"],
     accent: "from-navy-900 via-navy-800 to-brand-red",
+    overview:
+      "BSCS is a four-year computing degree built around real-world projects — from programming fundamentals to modern AI and data science, with mentorship that prepares you for jobs, freelancing or your own startup.",
+    eligibility: [
+      "Intermediate (ICS / FSc / ICom / DAE) or equivalent qualification",
+      "Original academic documents (Matric & Intermediate)",
+      "CNIC / B-Form and recent passport-size photographs",
+    ],
+    curriculum: [
+      { year: "Year 1", focus: "Programming fundamentals, mathematics & IT essentials" },
+      { year: "Year 2", focus: "Data structures, OOP & database systems" },
+      { year: "Year 3", focus: "Software engineering, operating systems, networks & AI" },
+      { year: "Year 4", focus: "Specialization electives, final-year project & internship" },
+    ],
   },
 ];
 

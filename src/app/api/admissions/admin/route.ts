@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid passcode" }, { status: 401 });
     }
 
-    const [applications, total, pending, contacted, approved, rejected, welfare] =
+    const [applications, total, pending, contacted, approved, rejected, welfare, byProgram] =
       await Promise.all([
         db.admission.findMany({
           orderBy: { createdAt: "desc" },
@@ -46,9 +46,11 @@ export async function POST(req: NextRequest) {
             phone: true,
             program: true,
             qualification: true,
+            lastMarks: true,
             city: true,
             isWelfare: true,
             status: true,
+            message: true,
             createdAt: true,
           },
         }),
@@ -58,11 +60,18 @@ export async function POST(req: NextRequest) {
         db.admission.count({ where: { status: "APPROVED" } }),
         db.admission.count({ where: { status: "REJECTED" } }),
         db.admission.count({ where: { isWelfare: true } }),
+        db.admission.groupBy({
+          by: ["program"],
+          _count: { program: true },
+        }),
       ]);
 
     return NextResponse.json({
       ok: true,
       stats: { total, pending, contacted, approved, rejected, welfare },
+      byProgram: byProgram
+        .map((b) => ({ program: b.program, count: b._count.program }))
+        .sort((a, b) => b.count - a.count),
       applications,
     });
   } catch (err) {
