@@ -3,7 +3,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 
 /**
- * Testimonials API — public GET, staff-only POST/DELETE.
+ * Testimonials API — public GET, staff-only POST/PATCH/DELETE.
  * Staff auth reuses the shared passcode (ADMIN_PASSCODE env fallback) in `adminKey`.
  */
 const ADMIN_PASSCODE = process.env.ADMIN_PASSCODE || "binc-admin-2026";
@@ -24,9 +24,20 @@ const createSchema = z.object({
   pinned: z.boolean().optional().default(false),
 });
 
-const deleteSchema = z.object({
+const updateSchema = z.object({
   adminKey: z.string().min(1).max(100),
   id: z.string().trim().min(5).max(50),
+  name: z.string().trim().min(2).max(80).optional(),
+  program: z.string().trim().min(2).max(80).optional(),
+  quote: z.string().trim().min(20).max(800).optional(),
+  rating: z.coerce.number().int().min(1).max(5).optional(),
+  photoUrl: z
+    .string()
+    .trim()
+    .max(500)
+    .refine((v) => v === "" || /^https?:\/\//.test(v), "Must be an http(s) URL")
+    .optional(),
+  pinned: z.boolean().optional(),
 });
 
 function isAuthed(key: string | null): boolean {
@@ -76,6 +87,48 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error("[testimonials:POST]", err);
     return NextResponse.json({ error: "Failed to create testimonial" }, { status: 500 });
+  }
+}
+
+/** PATCH — update (staff only). At least one editable field required. */
+export async function PATCH(req: NextRequest) {
+  try {
+    const parsed = updateSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      const first = parsed.error.issues[0];
+      return NextResponse.json(
+        { error: `Invalid field "${first.path.join(".")}": ${first.message}` },
+        { status: 400 }
+      );
+    }
+    if (!isAuthed(parsed.data.adminKey)) {
+      return NextResponse.json({ error: "Invalid passcode" }, { status: 401 });
+    }
+
+    const { adminKey: _key, id, ...fields } = parsed.data;
+    if (Object.keys(fields).length === 0) {
+      return NextResponse.json(
+        { error: "Nothing to update — provide at least one field" },
+        { status: 400 }
+      );
+    }
+
+    const existing = await db.testimonial.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: "Testimonial not found" }, { status: 404 });
+    }
+
+    const testimonial = await db.testimonial.update({
+      where: { id },
+      data: {
+        ...fields,
+        ...(fields.photoUrl !== undefined ? { photoUrl: fields.photoUrl || null } : {}),
+      },
+    });
+    return NextResponse.json({ ok: true, testimonial });
+  } catch (err) {
+    console.error("[testimonials:PATCH]", err);
+    return NextResponse.json({ error: "Failed to update testimonial" }, { status: 500 });
   }
 }
 

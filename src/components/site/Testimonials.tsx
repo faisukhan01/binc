@@ -57,6 +57,13 @@ export function Testimonials() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [live, setLive] = useState<LiveTestimonial[] | null>(null);
+  // Skeleton appears only if the fetch is still pending after 350ms (avoids flicker on fast loads)
+  const [showSkeleton, setShowSkeleton] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowSkeleton(true), 350);
+    return () => clearTimeout(t);
+  }, []);
 
   const load = useCallback(() => {
     fetch("/api/testimonials")
@@ -143,6 +150,31 @@ export function Testimonials() {
             className="absolute -top-6 left-1/2 size-20 -translate-x-1/2 text-navy-100"
             aria-hidden
           />
+          {live === null && showSkeleton ? (
+            <div
+              className="relative mx-auto max-w-2xl rounded-3xl border border-border bg-white p-8 shadow-xl shadow-navy-900/8 sm:p-10"
+              aria-hidden
+              role="presentation"
+            >
+              <div className="mx-auto flex justify-center gap-1">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <span key={i} className="size-5 animate-pulse rounded bg-navy-100" style={{ animationDelay: `${i * 120}ms` }} />
+                ))}
+              </div>
+              <div className="mt-6 space-y-3">
+                <span className="mx-auto block h-4 w-3/4 animate-pulse rounded-full bg-navy-100" />
+                <span className="mx-auto block h-4 w-2/3 animate-pulse rounded-full bg-navy-100" style={{ animationDelay: "150ms" }} />
+              </div>
+              <div className="mt-7 flex items-center justify-center gap-3">
+                <span className="size-12 animate-pulse rounded-full bg-gradient-to-br from-navy-100 to-navy-200" />
+                <span className="space-y-2">
+                  <span className="block h-3.5 w-28 animate-pulse rounded-full bg-navy-100" />
+                  <span className="block h-3 w-20 animate-pulse rounded-full bg-navy-100" style={{ animationDelay: "150ms" }} />
+                </span>
+              </div>
+              <span className="sr-only">Loading student stories…</span>
+            </div>
+          ) : (
           <div className="relative min-h-[300px] sm:min-h-[250px]">
             <AnimatePresence mode="wait">
               <motion.figure
@@ -199,6 +231,7 @@ export function Testimonials() {
               </motion.figure>
             </AnimatePresence>
           </div>
+          )}
 
           {/* Controls */}
           <div className="mt-7 flex items-center justify-center gap-4">

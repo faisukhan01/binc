@@ -142,6 +142,9 @@ export function AdminConsole() {
   const [tstPinned, setTstPinned] = useState(false);
   const [tstSaving, setTstSaving] = useState(false);
   const [tstError, setTstError] = useState<string | null>(null);
+  const [tstEditingId, setTstEditingId] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [programFilter, setProgramFilter] = useState("ALL");
 
   // Open via footer event
   useEffect(() => {
@@ -227,14 +230,63 @@ export function AdminConsole() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return apps;
-    return apps.filter((a) =>
-      [a.trackingCode, a.fullName, a.program, a.phone, a.city, a.status]
+    return apps.filter((a) => {
+      if (statusFilter !== "ALL" && a.status !== statusFilter) return false;
+      if (programFilter !== "ALL" && a.program !== programFilter) return false;
+      if (!q) return true;
+      return [a.trackingCode, a.fullName, a.program, a.phone, a.city, a.status]
         .join(" ")
         .toLowerCase()
-        .includes(q)
-    );
-  }, [apps, query]);
+        .includes(q);
+    });
+  }, [apps, query, statusFilter, programFilter]);
+
+  /** Applications per day for the last 14 days (oldest → newest, local-day buckets) */
+  const trendDays = useMemo(() => {
+    const keyOf = (d: Date) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const counts = new Map<string, number>();
+    for (const a of apps) {
+      const k = keyOf(new Date(a.createdAt));
+      counts.set(k, (counts.get(k) ?? 0) + 1);
+    }
+    const days: { key: string; label: string; full: string; count: number }[] = [];
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const k = keyOf(d);
+      days.push({
+        key: k,
+        label: String(d.getDate()).padStart(2, "0"),
+        full: d.toLocaleDateString("en-GB", { weekday: "short", day: "2-digit", month: "short" }),
+        count: counts.get(k) ?? 0,
+      });
+    }
+    return days;
+  }, [apps]);
+
+  const last7 = useMemo(
+    () => trendDays.slice(-7).reduce((s, d) => s + d.count, 0),
+    [trendDays]
+  );
+
+  /** Top cities by application count (max 6) */
+  const byCity = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const a of apps) {
+      const c = a.city.trim() || "Unknown";
+      m.set(c, (m.get(c) ?? 0) + 1);
+    }
+    return [...m.entries()]
+      .sort((x, y) => y[1] - x[1])
+      .slice(0, 6)
+      .map(([city, count]) => ({ city, count }));
+  }, [apps]);
+
+  const trendMax = useMemo(
+    () => Math.max(1, ...trendDays.map((d) => d.count)),
+    [trendDays]
+  );
 
   const logout = () => {
     localStorage.removeItem(STORAGE_KEY);
@@ -359,17 +411,31 @@ export function AdminConsole() {
     setTstRating(5);
     setTstPhoto("");
     setTstPinned(false);
+    setTstEditingId(null);
   }, []);
 
-  const createTestimonial = useCallback(async () => {
+  const startEditTestimonial = useCallback((t: TestimonialItem) => {
+    setTstEditingId(t.id);
+    setTstName(t.name);
+    setTstProgram(t.program);
+    setTstQuote(t.quote);
+    setTstRating(t.rating);
+    setTstPhoto(t.photoUrl ?? "");
+    setTstPinned(t.pinned);
+    setTstError(null);
+  }, []);
+
+  const saveTestimonial = useCallback(async () => {
     setTstSaving(true);
     setTstError(null);
     try {
+      const editing = Boolean(tstEditingId);
       const res = await fetch("/api/testimonials", {
-        method: "POST",
+        method: editing ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           adminKey,
+          ...(editing ? { id: tstEditingId } : {}),
           name: tstName,
           program: tstProgram,
           quote: tstQuote,
@@ -380,10 +446,14 @@ export function AdminConsole() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setTstError(data.error || "Could not publish testimonial");
+        setTstError(data.error || "Could not save testimonial");
         return;
       }
-      setTestimonials((list) => [data.testimonial as TestimonialItem, ...list]);
+      setTestimonials((list) =>
+        editing
+          ? list.map((t) => (t.id === tstEditingId ? (data.testimonial as TestimonialItem) : t))
+          : [data.testimonial as TestimonialItem, ...list]
+      );
       resetTstForm();
       notifySite("binc:testimonials-changed");
     } catch {
@@ -391,7 +461,7 @@ export function AdminConsole() {
     } finally {
       setTstSaving(false);
     }
-  }, [adminKey, tstName, tstProgram, tstQuote, tstRating, tstPhoto, tstPinned, resetTstForm, notifySite]);
+  }, [adminKey, tstEditingId, tstName, tstProgram, tstQuote, tstRating, tstPhoto, tstPinned, resetTstForm, notifySite]);
 
   const deleteTestimonial = useCallback(
     async (id: string) => {
@@ -616,6 +686,92 @@ export function AdminConsole() {
               </div>
             )}
 
+            {/* APPLICATION TRENDS — last 14 days + cities */}
+            <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_260px]">
+              <div className="rounded-xl border border-border bg-navy-50/60 p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-navy-800">
+                    Applications — last 14 days
+                  </p>
+                  <span
+                    className={cn(
+                      "rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ring-1",
+                      last7 > 0
+                        ? "bg-welfare-500/12 text-welfare-700 ring-welfare-500/30"
+                        : "bg-navy-100 text-navy-600 ring-navy-100"
+                    )}
+                  >
+                    {last7} in last 7 days
+                  </span>
+                </div>
+                <div className="mt-4 flex h-28 items-end gap-1.5" role="img" aria-label={`Bar chart of applications per day over the last 14 days, ${last7} in the last 7 days`}>
+                  {trendDays.map((d, i) => (
+                    <div
+                      key={d.key}
+                      className="group relative flex h-full flex-1 flex-col items-center justify-end gap-1"
+                      title={`${d.full}: ${d.count} application${d.count === 1 ? "" : "s"}`}
+                    >
+                      {d.count > 0 && (
+                        <span className="text-[9px] font-black text-navy-800 opacity-0 transition-opacity group-hover:opacity-100">
+                          {d.count}
+                        </span>
+                      )}
+                      <motion.div
+                        initial={{ height: 0 }}
+                        animate={{ height: `${Math.max((d.count / trendMax) * 100, d.count > 0 ? 10 : 3)}%` }}
+                        transition={{ type: "spring", damping: 24, stiffness: 200, delay: i * 0.02 }}
+                        className={cn(
+                          "w-full max-w-[22px] rounded-t-md transition-colors",
+                          d.count > 0
+                            ? i === trendDays.length - 1
+                              ? "bg-gradient-to-t from-brand-red to-gold-400"
+                              : "bg-gradient-to-t from-navy-800 to-navy-500 group-hover:from-brand-red group-hover:to-gold-400"
+                            : "bg-navy-100"
+                        )}
+                      />
+                      <span
+                        className={cn(
+                          "text-[9px] font-bold leading-none",
+                          i === trendDays.length - 1 ? "text-brand-red" : "text-muted-foreground/70"
+                        )}
+                      >
+                        {d.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-xl border border-border bg-white p-4">
+                <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-navy-800">
+                  Top cities
+                </p>
+                {byCity.length === 0 ? (
+                  <p className="mt-3 text-xs text-muted-foreground">No applications yet.</p>
+                ) : (
+                  <ul className="mt-3 space-y-1.5">
+                    {byCity.map((c, i) => (
+                      <li key={c.city} className="flex items-center gap-2">
+                        <span
+                          className={cn(
+                            "grid size-5 shrink-0 place-items-center rounded-md text-[10px] font-black text-white",
+                            i === 0 ? "bg-brand-red" : i === 1 ? "bg-gold-500 text-navy-950" : "bg-navy-700"
+                          )}
+                        >
+                          {i + 1}
+                        </span>
+                        <span className="min-w-0 flex-1 truncate text-xs font-bold text-navy-900">
+                          {c.city}
+                        </span>
+                        <span className="rounded-full bg-navy-50 px-2 py-0.5 text-[10px] font-black text-navy-800 ring-1 ring-navy-100">
+                          {c.count}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+
             {/* Toolbar */}
             <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="relative flex-1">
@@ -627,6 +783,40 @@ export function AdminConsole() {
                   aria-label="Search applications"
                   className="h-11 rounded-xl pl-10 text-sm"
                 />
+              </div>
+              <div className="flex gap-2">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger
+                    className="h-11 w-[126px] rounded-xl text-xs font-bold"
+                    aria-label="Filter by status"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL" className="text-xs font-bold">All statuses</SelectItem>
+                    {STATUSES.map((s) => (
+                      <SelectItem key={s} value={s} className="text-xs font-bold">
+                        {STATUS_STYLES[s].label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={programFilter} onValueChange={setProgramFilter}>
+                  <SelectTrigger
+                    className="h-11 w-[118px] rounded-xl text-xs font-bold"
+                    aria-label="Filter by program"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL" className="text-xs font-bold">All programs</SelectItem>
+                    {byProgram.map((p) => (
+                      <SelectItem key={p.program} value={p.program} className="text-xs font-bold">
+                        {p.program}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="flex gap-2">
                 <Button
@@ -646,6 +836,22 @@ export function AdminConsole() {
                 </Button>
               </div>
             </div>
+            {(statusFilter !== "ALL" || programFilter !== "ALL") && (
+              <div className="mt-2.5 flex items-center gap-2">
+                <p className="text-[11px] font-bold text-muted-foreground">
+                  Filters active — showing {filtered.length} of {apps.length}
+                </p>
+                <button
+                  onClick={() => {
+                    setStatusFilter("ALL");
+                    setProgramFilter("ALL");
+                  }}
+                  className="inline-flex items-center gap-1 rounded-full bg-navy-50 px-2.5 py-1 text-[11px] font-extrabold text-navy-800 ring-1 ring-navy-100 transition hover:bg-navy-100"
+                >
+                  <X className="size-3" /> Clear filters
+                </button>
+              </div>
+            )}
 
             {/* List */}
             <div className="mt-4 max-h-[46vh] overflow-y-auto rounded-xl border border-border">
@@ -930,14 +1136,36 @@ export function AdminConsole() {
             ) : (
               /* ============ TESTIMONIALS (STUDENT VOICES) TAB ============ */
               <div>
-                {/* Compose */}
-                <div className="rounded-xl border border-border bg-navy-50/50 p-4">
-                  <p className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.2em] text-navy-800">
-                    <Quote className="size-4 text-brand-red" /> Publish a student testimonial
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Real student quotes appear in “Student Voices” with a verified badge.
-                  </p>
+                {/* Compose / Edit */}
+                <div
+                  className={cn(
+                    "rounded-xl border p-4 transition-colors",
+                    tstEditingId ? "border-gold-400/60 bg-gold-400/5" : "border-border bg-navy-50/50"
+                  )}
+                >
+                  {tstEditingId ? (
+                    <div className="mb-3 flex items-center justify-between gap-2 rounded-lg bg-gold-400/15 px-3 py-2">
+                      <p className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.2em] text-gold-600">
+                        <Pencil className="size-3.5" /> Editing testimonial
+                      </p>
+                      <button
+                        onClick={resetTstForm}
+                        className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-extrabold text-gold-600 transition hover:bg-gold-400/20"
+                        aria-label="Cancel editing testimonial"
+                      >
+                        <X className="size-3.5" /> Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.2em] text-navy-800">
+                      <Quote className="size-4 text-brand-red" /> Publish a student testimonial
+                    </p>
+                  )}
+                  {!tstEditingId && (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Real student quotes appear in “Student Voices” with a verified badge.
+                    </p>
+                  )}
                   <div className="mt-3 grid gap-3">
                     <div className="grid gap-3 sm:grid-cols-2">
                       <div className="space-y-1.5">
@@ -1008,18 +1236,27 @@ export function AdminConsole() {
                         </span>
                       </label>
                       <Button
-                        onClick={() => void createTestimonial()}
+                        onClick={() => void saveTestimonial()}
                         disabled={
                           tstSaving ||
                           tstName.trim().length < 2 ||
                           tstProgram.trim().length < 2 ||
                           tstQuote.trim().length < 20
                         }
-                        className="ml-auto min-h-[40px] rounded-xl bg-gradient-to-r from-navy-900 to-navy-800 px-5 text-sm font-extrabold text-white shadow-lg hover:shadow-xl disabled:opacity-60"
+                        className={cn(
+                          "ml-auto min-h-[40px] rounded-xl px-5 text-sm font-extrabold text-white shadow-lg hover:shadow-xl disabled:opacity-60",
+                          tstEditingId
+                            ? "bg-gradient-to-r from-gold-500 to-gold-600 !text-navy-950"
+                            : "bg-gradient-to-r from-navy-900 to-navy-800"
+                        )}
                       >
                         {tstSaving ? (
                           <>
-                            <Loader2 className="size-4 animate-spin" /> Publishing…
+                            <Loader2 className="size-4 animate-spin" /> Saving…
+                          </>
+                        ) : tstEditingId ? (
+                          <>
+                            <Pencil className="size-4" /> Save changes
                           </>
                         ) : (
                           <>
@@ -1100,15 +1337,26 @@ export function AdminConsole() {
                               <p className="text-xs font-semibold text-brand-red">{t.program}</p>
                               <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">“{t.quote}”</p>
                             </div>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              onClick={() => void deleteTestimonial(t.id)}
-                              aria-label={`Delete testimonial from ${t.name}`}
-                              className="size-9 shrink-0 border-brand-red/25 text-brand-red hover:bg-brand-red hover:text-white"
-                            >
-                              <Trash2 className="size-4" />
-                            </Button>
+                            <div className="flex shrink-0 items-center gap-1.5 self-end sm:self-center">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => startEditTestimonial(t)}
+                                aria-label={`Edit testimonial from ${t.name}`}
+                                className="size-9 border-navy-200 text-navy-700 hover:bg-navy-900 hover:text-white"
+                              >
+                                <Pencil className="size-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => void deleteTestimonial(t.id)}
+                                aria-label={`Delete testimonial from ${t.name}`}
+                                className="size-9 border-brand-red/25 text-brand-red hover:bg-brand-red hover:text-white"
+                              >
+                                <Trash2 className="size-4" />
+                              </Button>
+                            </div>
                           </motion.li>
                         ))}
                       </AnimatePresence>

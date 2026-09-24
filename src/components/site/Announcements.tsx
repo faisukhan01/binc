@@ -40,6 +40,13 @@ const FRESH_MS = 3 * 24 * 60 * 60 * 1000; // 3 days
 
 export function Announcements() {
   const [items, setItems] = useState<Announcement[] | null>(null);
+  // Skeleton appears only if the fetch is still pending after 350ms (avoids flicker on fast loads)
+  const [showSkeleton, setShowSkeleton] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowSkeleton(true), 350);
+    return () => clearTimeout(t);
+  }, []);
 
   const load = useCallback(() => {
     fetch("/api/announcements")
@@ -56,7 +63,8 @@ export function Announcements() {
   }, [load]);
 
   // Section stays completely hidden until staff publish something
-  if (!items || items.length === 0) return null;
+  if (!items && !showSkeleton) return null;
+  if (items && items.length === 0) return null;
 
   return (
     <section id="news" className="relative overflow-hidden bg-white py-20 sm:py-28">
@@ -79,7 +87,27 @@ export function Announcements() {
         />
 
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {items.map((a, i) => {
+          {!items
+            ? Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={`sk-${i}`}
+                  aria-hidden
+                  role="presentation"
+                  className="rounded-2xl border border-border bg-white p-5 shadow-md shadow-navy-900/6"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="h-6 w-20 animate-pulse rounded-full bg-navy-100" style={{ animationDelay: `${i * 140}ms` }} />
+                  </div>
+                  <span className="mt-4 block h-5 w-3/4 animate-pulse rounded-full bg-navy-100" style={{ animationDelay: `${i * 140 + 80}ms` }} />
+                  <div className="mt-3 space-y-2">
+                    <span className="block h-3.5 w-full animate-pulse rounded-full bg-navy-100" style={{ animationDelay: `${i * 140 + 160}ms` }} />
+                    <span className="block h-3.5 w-5/6 animate-pulse rounded-full bg-navy-100" style={{ animationDelay: `${i * 140 + 240}ms` }} />
+                    <span className="block h-3.5 w-2/3 animate-pulse rounded-full bg-navy-100" style={{ animationDelay: `${i * 140 + 320}ms` }} />
+                  </div>
+                  <span className="mt-5 block h-3 w-32 animate-pulse rounded-full bg-navy-100" style={{ animationDelay: `${i * 140 + 400}ms` }} />
+                </div>
+              ))
+            : items.map((a, i) => {
             const tag = TAG_STYLES[a.tag] ?? TAG_STYLES.Notice;
             const fresh = Date.now() - new Date(a.createdAt).getTime() < FRESH_MS;
             return (
@@ -133,15 +161,17 @@ export function Announcements() {
                 </motion.article>
               </Reveal>
             );
-          })}
+            })}
         </div>
 
-        <Reveal delay={0.15}>
-          <p className="mt-8 flex items-center justify-center gap-2 text-center text-xs font-semibold text-muted-foreground">
-            <Megaphone className="size-4 text-brand-red" />
-            Posted by the Bright International College admissions office
-          </p>
-        </Reveal>
+        {items && (
+          <Reveal delay={0.15}>
+            <p className="mt-8 flex items-center justify-center gap-2 text-center text-xs font-semibold text-muted-foreground">
+              <Megaphone className="size-4 text-brand-red" />
+              Posted by the Bright International College admissions office
+            </p>
+          </Reveal>
+        )}
       </div>
     </section>
   );
