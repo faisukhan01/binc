@@ -4,7 +4,9 @@ import { MarqueeStrip } from "@/components/site/MarqueeStrip";
 import { About } from "@/components/site/About";
 import { Programs } from "@/components/site/Programs";
 import { Welfare } from "@/components/site/Welfare";
+import { Fees } from "@/components/site/Fees";
 import { CampusLife } from "@/components/site/CampusLife";
+import { Gallery } from "@/components/site/Gallery";
 import { Process } from "@/components/site/Process";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Faq } from "@/components/site/Faq";
@@ -14,6 +16,8 @@ import { Footer } from "@/components/site/Footer";
 import { FloatingWhatsApp } from "@/components/site/FloatingWhatsApp";
 import { MobileCtaBar } from "@/components/site/MobileCtaBar";
 import { AdmissionPopup } from "@/components/site/AdmissionPopup";
+import { AdminConsole } from "@/components/site/AdminConsole";
+import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { SITE, FAQS } from "@/lib/site-data";
 
 const jsonLd = {
@@ -61,6 +65,7 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <ScrollProgress />
       <Navbar />
       <main className="flex-1">
         <Hero />
@@ -68,8 +73,10 @@ export default function Home() {
         <About />
         <Programs />
         <Welfare />
+        <Fees />
         <Process />
         <CampusLife />
+        <Gallery />
         <Testimonials />
         <Faq />
         <CtaBanner />
@@ -79,6 +86,7 @@ export default function Home() {
       <MobileCtaBar />
       <FloatingWhatsApp />
       <AdmissionPopup />
+      <AdminConsole />
     </div>
   );
 }

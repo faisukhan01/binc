@@ -1,9 +1,12 @@
+"use client";
+
 import Image from "next/image";
-import { Facebook, Instagram, Mail, MapPin, Phone, Youtube } from "lucide-react";
+import { Facebook, Instagram, LockKeyhole, Mail, MapPin, Phone, Youtube } from "lucide-react";
 import { NAV_LINKS, PROGRAMS, SITE } from "@/lib/site-data";
 
 export function Footer() {
   const year = new Date().getFullYear();
+  const openAdmin = () => window.dispatchEvent(new Event("binc:open-admin"));
   return (
     <footer className="mt-auto relative overflow-hidden bg-navy-950 text-navy-100">
       {/* Gold + red top line */}
@@ -146,6 +149,13 @@ export function Footer() {
             <span className="size-1.5 rounded-full bg-gold-400" />
             Admissions Open — Fall 2026 · Lahore, Pakistan
           </p>
+          <button
+            onClick={openAdmin}
+            className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-navy-100/45 transition-colors hover:text-gold-400"
+          >
+            <LockKeyhole className="size-3" />
+            Staff Login
+          </button>
         </div>
       </div>
     </footer>

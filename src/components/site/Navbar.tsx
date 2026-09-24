@@ -95,15 +95,18 @@ export function Navbar() {
             </a>
 
             {/* Desktop links */}
-            <div className="hidden lg:flex items-center gap-1">
+            <div className="hidden lg:flex items-center gap-0.5 xl:gap-1">
               {NAV_LINKS.map((l) => (
                 <a
                   key={l.href}
                   href={l.href}
-                  className="relative px-3 py-2 text-sm font-semibold text-navy-850/80 hover:text-navy-950 rounded-lg hover:bg-navy-50 transition-colors group"
+                  className={cn(
+                    "relative rounded-lg px-2 py-2 text-[13px] font-semibold text-navy-850/80 hover:text-navy-950 hover:bg-navy-50 transition-colors group xl:px-2.5 xl:text-sm",
+                    (l.href === "#campus" || l.href === "#gallery") && "hidden xl:block"
+                  )}
                 >
                   {l.label}
-                  <span className="absolute inset-x-3 -bottom-px h-0.5 bg-gradient-to-r from-brand-red to-gold-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full" />
+                  <span className="absolute inset-x-2.5 -bottom-px h-0.5 bg-gradient-to-r from-brand-red to-gold-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full" />
                 </a>
               ))}
             </div>

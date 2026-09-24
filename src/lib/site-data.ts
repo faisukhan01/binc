@@ -86,7 +86,9 @@ export const NAV_LINKS = [
   { label: "About", href: "#about" },
   { label: "Programs", href: "#programs" },
   { label: "Welfare", href: "#welfare" },
+  { label: "Fees", href: "#fees" },
   { label: "Campus Life", href: "#campus" },
+  { label: "Gallery", href: "#gallery" },
   { label: "FAQs", href: "#faqs" },
   { label: "Contact", href: "#contact" },
 ];
@@ -173,5 +175,70 @@ export const TESTIMONIALS = [
     quote:
       "The welfare support program made my education possible when my family needed it most. Forever grateful to Bright International College.",
     rating: 5,
+  },
+];
+
+/**
+ * Fee & payment structure — fee amounts are shared personally by the
+ * admissions office (they vary by session), so we present the *structure*
+ * and a direct WhatsApp channel to receive the exact schedule.
+ */
+export const FEE_INFO = {
+  includes: [
+    { icon: "FlaskConical", label: "Modern Labs & Equipment", desc: "Pharmacy, rehab & computer labs included in tuition" },
+    { icon: "BookOpen", label: "Library & Study Resources", desc: "Full library access, digital resources & past papers" },
+    { icon: "Stethoscope", label: "Hospital Rotations", desc: "Clinical placements arranged by the college" },
+    { icon: "BadgeCheck", label: "Exam & License Prep", desc: "Guidance for university exams & licensing steps" },
+  ],
+  payment: [
+    { title: "Semester-wise Payment", desc: "Pay tuition twice a year at the start of each semester.", icon: "CalendarRange" },
+    { title: "Easy Installments", desc: "Split semester dues into monthly installments on request.", icon: "Wallet" },
+    { title: "Welfare 100% Free", desc: "Eligible PWWF welfare workers study completely free.", icon: "HeartHandshake" },
+  ],
+};
+
+export interface GalleryItem {
+  src: string;
+  alt: string;
+  caption: string;
+  tag: string;
+}
+
+export const GALLERY: GalleryItem[] = [
+  {
+    src: "/images/gallery/pharmacy-lab.png",
+    alt: "Students working in the pharmacy lab",
+    caption: "Pharmacy Lab — hands-on dispenser training",
+    tag: "Pharm-D",
+  },
+  {
+    src: "/images/gallery/cs-lab.png",
+    alt: "Computer science lab with students coding",
+    caption: "CS Lab — coding sessions & AI projects",
+    tag: "BSCS",
+  },
+  {
+    src: "/images/gallery/dpt-lab.png",
+    alt: "Physical therapy rehabilitation gym",
+    caption: "Rehab Lab — DPT clinical practice",
+    tag: "DPT",
+  },
+  {
+    src: "/images/gallery/library.png",
+    alt: "Library reading hall with students studying",
+    caption: "Library — quiet study & research",
+    tag: "Campus",
+  },
+  {
+    src: "/images/gallery/campus.png",
+    alt: "Campus building exterior with students walking",
+    caption: "Our Campus — Township, Lahore",
+    tag: "Campus",
+  },
+  {
+    src: "/images/gallery/graduation.png",
+    alt: "Graduation ceremony with students celebrating",
+    caption: "Convocation — Bright futures launched",
+    tag: "Events",
   },
 ];
