@@ -1,13 +1,36 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { ArrowRight, RadioTower, Sparkles } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { AlarmClock, ArrowRight, RadioTower, Sparkles } from "lucide-react";
 import { Reveal } from "./Reveal";
 import { SITE } from "@/lib/site-data";
 
+interface Remaining {
+  days: number;
+  hours: number;
+  mins: number;
+  secs: number;
+}
+
+function diff(deadline: string): Remaining | null {
+  // End-of-day local time on the deadline date
+  const end = new Date(`${deadline}T23:59:59`).getTime();
+  if (Number.isNaN(end)) return null;
+  const ms = end - Date.now();
+  if (ms <= 0) return null;
+  return {
+    days: Math.floor(ms / 86_400_000),
+    hours: Math.floor((ms % 86_400_000) / 3_600_000),
+    mins: Math.floor((ms % 3_600_000) / 60_000),
+    secs: Math.floor((ms % 60_000) / 1000),
+  };
+}
+
 export function CtaBanner() {
   const [total, setTotal] = useState<number | null>(null);
+  const [deadline, setDeadline] = useState<string | null>(null);
+  const [remaining, setRemaining] = useState<Remaining | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -17,10 +40,42 @@ export function CtaBanner() {
         if (!cancelled && d?.ok && typeof d.total === "number") setTotal(d.total);
       })
       .catch(() => {});
+    fetch("/api/settings")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!cancelled && d?.ok && typeof d.settings?.admissionDeadline === "string") {
+          setDeadline(d.settings.admissionDeadline || null);
+        }
+      })
+      .catch(() => {});
     return () => {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    const update = () => setRemaining(diff(deadline ?? ""));
+    // First update on the next tick; then every second + when tab becomes visible
+    const initial = setTimeout(update, 0);
+    const id = setInterval(update, 1000);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") update();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearTimeout(initial);
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [deadline]);
+
+  const closeLabel = deadline
+    ? new Date(`${deadline}T12:00:00`).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : null;
 
   return (
     <section aria-label="Admissions call to action" className="relative bg-white py-14 sm:py-20">
@@ -75,6 +130,51 @@ export function CtaBanner() {
                 </span>
               </motion.div>
             )}
+
+            {/* Deadline countdown (staff-configured, hidden when unset/past) */}
+            <AnimatePresence>
+              {remaining && (
+                <motion.div
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  className="relative mx-auto mt-6 max-w-md"
+                  role="timer"
+                  aria-label={`Applications close on ${closeLabel}. ${remaining.days} days, ${remaining.hours} hours, ${remaining.mins} minutes and ${remaining.secs} seconds remaining.`}
+                >
+                  <p className="mb-3 flex items-center justify-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.22em] text-white/70">
+                    <AlarmClock className="size-3.5 text-gold-400" />
+                    Applications close {closeLabel}
+                  </p>
+                  <div className="grid grid-cols-4 gap-2 sm:gap-3">
+                    {(
+                      [
+                        { label: "Days", v: remaining.days },
+                        { label: "Hours", v: remaining.hours },
+                        { label: "Mins", v: remaining.mins },
+                        { label: "Secs", v: remaining.secs },
+                      ] as const
+                    ).map((u) => (
+                      <div
+                        key={u.label}
+                        className="relative overflow-hidden rounded-2xl border border-white/15 bg-white/[0.07] px-1 py-3 backdrop-blur-sm"
+                      >
+                        <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-brand-red via-gold-400 to-brand-red opacity-80" />
+                        <p
+                          key={u.v}
+                          className="font-display text-2xl font-black tabular-nums leading-none text-white sm:text-3xl"
+                        >
+                          {String(u.v).padStart(2, "0")}
+                        </p>
+                        <p className="mt-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-gold-300/90">
+                          {u.label}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <div className="relative mt-8 flex flex-wrap items-center justify-center gap-3.5">
               <a

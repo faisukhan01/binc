@@ -1,10 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   BadgeCheck,
+  CalendarClock,
+  Check,
   Clock3,
+  Copy,
   Download,
   GraduationCap,
   KeyRound,
@@ -12,6 +15,7 @@ import {
   LockKeyhole,
   LogOut,
   Megaphone,
+  MessageCircle,
   Newspaper,
   Pencil,
   Pin,
@@ -19,6 +23,7 @@ import {
   Quote,
   RefreshCw,
   Search,
+  Settings2,
   ShieldCheck,
   Star,
   Trash2,
@@ -47,6 +52,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
 interface AdminApplication {
   id: string;
@@ -110,6 +116,18 @@ const STATUS_STYLES: Record<string, { label: string; className: string }> = {
 
 const STORAGE_KEY = "binc_admin_key";
 
+/** Convert a local Pakistani mobile number (03XX-XXXXXXX) to wa.me intl digits (92XXXXXXXXXX) */
+function waIntl(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.startsWith("92")) return digits;
+  if (digits.startsWith("0")) return `92${digits.slice(1)}`;
+  return digits;
+}
+
+function firstName(full: string): string {
+  return full.trim().split(/\s+/)[0] ?? full;
+}
+
 export function AdminConsole() {
   const [open, setOpen] = useState(false);
   const [adminKey, setAdminKey] = useState("");
@@ -122,7 +140,20 @@ export function AdminConsole() {
   const [query, setQuery] = useState("");
   const [savingCode, setSavingCode] = useState<string | null>(null);
   const [booted, setBooted] = useState(false);
-  const [tab, setTab] = useState<"applications" | "announcements" | "testimonials">("applications");
+  const [tab, setTab] = useState<
+    "applications" | "announcements" | "testimonials" | "settings"
+  >("applications");
+
+  /** Public site settings for the Settings tab (deadline countdown) */
+  const loadSettings = useCallback(async () => {
+    try {
+      const res = await fetch("/api/settings");
+      const data = await res.json();
+      if (res.ok) setDeadline(data.settings?.admissionDeadline ?? "");
+    } catch {
+      /* non-critical */
+    }
+  }, []);
   const [announcements, setAnnouncements] = useState<AnnouncementItem[]>([]);
   const [annLoading, setAnnLoading] = useState(false);
   const [annTitle, setAnnTitle] = useState("");
@@ -145,6 +176,15 @@ export function AdminConsole() {
   const [tstEditingId, setTstEditingId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [programFilter, setProgramFilter] = useState("ALL");
+  const [trendRange, setTrendRange] = useState<7 | 14 | 30>(14);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [newApp, setNewApp] = useState<{ code: string; name: string } | null>(null);
+  const [highlightId, setHighlightId] = useState<string | null>(null);
+  const [liveAt, setLiveAt] = useState<number | null>(null);
+  const [deadline, setDeadline] = useState("");
+  const [deadlineSaving, setDeadlineSaving] = useState(false);
+  const [deadlineMsg, setDeadlineMsg] = useState<string | null>(null);
+  const prevTotalRef = useRef<number | null>(null);
 
   // Open via footer event
   useEffect(() => {
@@ -178,16 +218,20 @@ export function AdminConsole() {
         setApps(data.applications);
         setStats(data.stats);
         setByProgram(data.byProgram ?? []);
+        prevTotalRef.current = data.stats.total;
+        setNewApp(null);
+        setHighlightId(null);
         setAuthed(true);
         void loadAnnouncements();
         void loadTestimonials();
+        void loadSettings();
       } catch {
         setError("Network error — please try again");
       } finally {
         setLoading(false);
       }
     },
-    []
+    [loadSettings]
   );
 
   // Auto-login if a saved key exists
@@ -228,6 +272,81 @@ export function AdminConsole() {
     [adminKey, apps]
   );
 
+  /** Silent re-fetch used by live polling — detects new applications without UI churn */
+  const silentRefresh = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admissions/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminKey }),
+      });
+      if (!res.ok) {
+        if (res.status === 401 || res.status === 429) {
+          const data = await res.json().catch(() => null);
+          localStorage.removeItem(STORAGE_KEY);
+          setAuthed(false);
+          setError(data?.error ?? "Session expired — please log in again");
+        }
+        return;
+      }
+      const data = await res.json();
+      const prev = prevTotalRef.current;
+      const newest = (data.applications as AdminApplication[])[0];
+      if (prev !== null && data.stats.total > prev && newest) {
+        setNewApp({ code: newest.trackingCode, name: newest.fullName });
+        setHighlightId(newest.id);
+        toast({
+          title: "New application received 🎉",
+          description: `${newest.trackingCode} · ${newest.fullName} — ${newest.program}`,
+        });
+        setTimeout(() => setHighlightId(null), 8000);
+        setTimeout(() => setNewApp(null), 12000);
+      }
+      prevTotalRef.current = data.stats.total;
+      setApps(data.applications);
+      setStats(data.stats);
+      setByProgram(data.byProgram ?? []);
+      setLiveAt(Date.now());
+    } catch {
+      /* transient network error — the next poll retries */
+    }
+  }, [adminKey, toast]);
+
+  // Live polling — every 20s while the console is open & the tab is visible
+  useEffect(() => {
+    if (!authed || !open) return;
+    const id = setInterval(() => {
+      if (document.visibilityState === "visible") void silentRefresh();
+    }, 20000);
+    return () => clearInterval(id);
+  }, [authed, open, silentRefresh]);
+
+  const saveDeadline = useCallback(
+    async (value: string) => {
+      setDeadlineSaving(true);
+      setDeadlineMsg(null);
+      try {
+        const res = await fetch("/api/settings", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ adminKey, admissionDeadline: value }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setDeadlineMsg(data.error || "Could not save the deadline");
+          return;
+        }
+        setDeadline(data.admissionDeadline ?? value);
+        setDeadlineMsg("✓ Saved — the website countdown updates instantly.");
+      } catch {
+        setDeadlineMsg("Network error — please try again");
+      } finally {
+        setDeadlineSaving(false);
+      }
+    },
+    [adminKey]
+  );
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return apps.filter((a) => {
@@ -241,7 +360,7 @@ export function AdminConsole() {
     });
   }, [apps, query, statusFilter, programFilter]);
 
-  /** Applications per day for the last 14 days (oldest → newest, local-day buckets) */
+  /** Applications per day for the selected range (oldest → newest, local-day buckets) */
   const trendDays = useMemo(() => {
     const keyOf = (d: Date) =>
       `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -251,7 +370,7 @@ export function AdminConsole() {
       counts.set(k, (counts.get(k) ?? 0) + 1);
     }
     const days: { key: string; label: string; full: string; count: number }[] = [];
-    for (let i = 13; i >= 0; i--) {
+    for (let i = trendRange - 1; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
       const k = keyOf(d);
@@ -263,7 +382,7 @@ export function AdminConsole() {
       });
     }
     return days;
-  }, [apps]);
+  }, [apps, trendRange]);
 
   const last7 = useMemo(
     () => trendDays.slice(-7).reduce((s, d) => s + d.count, 0),
@@ -299,6 +418,12 @@ export function AdminConsole() {
     setTestimonials([]);
     setTab("applications");
     setError(null);
+    setNewApp(null);
+    setHighlightId(null);
+    setDeadline("");
+    setDeadlineMsg(null);
+    setLiveAt(null);
+    prevTotalRef.current = null;
   };
 
   const loadAnnouncements = useCallback(async () => {
@@ -587,7 +712,7 @@ export function AdminConsole() {
           <div className="px-5 py-5 sm:px-6">
             {/* Tabs */}
             <div
-              className="mb-5 grid grid-cols-3 gap-1 rounded-xl bg-navy-50 p-1"
+              className="mb-5 grid grid-cols-2 gap-1 rounded-xl bg-navy-50 p-1 sm:grid-cols-4"
               role="tablist"
               aria-label="Console sections"
             >
@@ -595,12 +720,13 @@ export function AdminConsole() {
                 { id: "applications", label: "Applications", icon: Users, count: apps.length },
                 { id: "announcements", label: "Announcements", icon: Megaphone, count: announcements.length },
                 { id: "testimonials", label: "Voices", icon: Quote, count: testimonials.length },
+                { id: "settings", label: "Settings", icon: Settings2, count: undefined },
               ] as const).map((t) => (
                 <button
                   key={t.id}
                   role="tab"
                   aria-selected={tab === t.id}
-                  aria-label={`${t.label} (${t.count})`}
+                  aria-label={t.count !== undefined ? `${t.label} (${t.count})` : t.label}
                   onClick={() => setTab(t.id)}
                   className={`inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-lg px-1 text-[13px] font-extrabold transition-all sm:gap-2 sm:text-sm ${
                     tab === t.id
@@ -610,19 +736,47 @@ export function AdminConsole() {
                 >
                   <t.icon className="size-4 shrink-0" />
                   <span className="hidden sm:inline">{t.label}</span>
-                  <span
-                    className={`ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-black leading-none ${
-                      tab === t.id ? "bg-navy-900 text-gold-400" : "bg-navy-100 text-navy-700"
-                    }`}
-                  >
-                    {t.count}
-                  </span>
+                  {t.count !== undefined && (
+                    <span
+                      className={`ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-black leading-none ${
+                        tab === t.id ? "bg-navy-900 text-gold-400" : "bg-navy-100 text-navy-700"
+                      }`}
+                    >
+                      {t.count}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
 
             {tab === "applications" ? (
             <>
+            {/* New-application live alert */}
+            <AnimatePresence>
+              {newApp && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  className="mb-3 flex items-center justify-between gap-3 rounded-xl border border-gold-400/50 bg-gradient-to-r from-gold-400/15 to-transparent px-4 py-3"
+                >
+                  <p className="min-w-0 truncate text-xs font-extrabold text-navy-900">
+                    <span className="mr-2 inline-flex items-center rounded-full bg-brand-red px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
+                      New
+                    </span>
+                    {newApp.code} · {newApp.name} just applied
+                  </p>
+                  <button
+                    onClick={() => setNewApp(null)}
+                    aria-label="Dismiss new application alert"
+                    className="rounded-md p-1 text-navy-600 transition hover:bg-navy-100"
+                  >
+                    <X className="size-4" />
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Stats */}
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
               {[
@@ -691,20 +845,43 @@ export function AdminConsole() {
               <div className="rounded-xl border border-border bg-navy-50/60 p-4">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-navy-800">
-                    Applications — last 14 days
+                    Applications — last {trendRange} days
                   </p>
-                  <span
-                    className={cn(
-                      "rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ring-1",
-                      last7 > 0
-                        ? "bg-welfare-500/12 text-welfare-700 ring-welfare-500/30"
-                        : "bg-navy-100 text-navy-600 ring-navy-100"
-                    )}
-                  >
-                    {last7} in last 7 days
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="flex rounded-lg bg-white p-0.5 ring-1 ring-navy-100"
+                      role="group"
+                      aria-label="Chart range"
+                    >
+                      {([7, 14, 30] as const).map((r) => (
+                        <button
+                          key={r}
+                          onClick={() => setTrendRange(r)}
+                          aria-pressed={trendRange === r}
+                          className={cn(
+                            "rounded-md px-2 py-1 text-[10px] font-black transition-colors",
+                            trendRange === r
+                              ? "bg-navy-900 text-gold-400"
+                              : "text-navy-600 hover:bg-navy-50"
+                          )}
+                        >
+                          {r}d
+                        </button>
+                      ))}
+                    </div>
+                    <span
+                      className={cn(
+                        "rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ring-1",
+                        last7 > 0
+                          ? "bg-welfare-500/12 text-welfare-700 ring-welfare-500/30"
+                          : "bg-navy-100 text-navy-600 ring-navy-100"
+                      )}
+                    >
+                      {last7} in last 7 days
+                    </span>
+                  </div>
                 </div>
-                <div className="mt-4 flex h-28 items-end gap-1.5" role="img" aria-label={`Bar chart of applications per day over the last 14 days, ${last7} in the last 7 days`}>
+                <div className="mt-4 flex h-28 items-end gap-1.5" role="img" aria-label={`Bar chart of applications per day over the last ${trendRange} days, ${last7} in the last 7 days`}>
                   {trendDays.map((d, i) => (
                     <div
                       key={d.key}
@@ -819,6 +996,16 @@ export function AdminConsole() {
                 </Select>
               </div>
               <div className="flex gap-2">
+                <span
+                  className="hidden items-center gap-1.5 rounded-full bg-welfare-500/10 px-3 py-2 text-[11px] font-black uppercase tracking-wider text-welfare-700 ring-1 ring-welfare-500/30 sm:inline-flex"
+                  title="Applications auto-refresh every 20 seconds while this window is open"
+                >
+                  <span className="relative flex size-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-welfare-500 opacity-80" />
+                    <span className="relative inline-flex size-2 rounded-full bg-welfare-500" />
+                  </span>
+                  Live
+                </span>
                 <Button
                   variant="outline"
                   onClick={exportCsv}
@@ -873,7 +1060,10 @@ export function AdminConsole() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="flex flex-col gap-3 p-4 transition-colors hover:bg-navy-50/60 sm:flex-row sm:items-center sm:justify-between"
+                        className={cn(
+                          "flex flex-col gap-3 p-4 transition-colors sm:flex-row sm:items-center sm:justify-between",
+                          highlightId === a.id ? "bg-gold-400/15" : "hover:bg-navy-50/60"
+                        )}
                       >
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
@@ -911,6 +1101,43 @@ export function AdminConsole() {
                           </p>
                         </div>
                         <div className="flex items-center gap-2 self-end sm:self-center">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() =>
+                              window.open(
+                                `https://wa.me/${waIntl(a.phone)}?text=${encodeURIComponent(
+                                  `Assalam-o-Alaikum ${firstName(a.fullName)}, this is Bright International College (Admissions Office). Regarding your Fall 2026 application ${a.trackingCode} for ${a.program} — we have received it and would like to guide you through the next steps.`
+                                )}`,
+                                "_blank",
+                                "noopener"
+                              )
+                            }
+                            aria-label={`WhatsApp ${a.fullName} about ${a.trackingCode}`}
+                            className="size-9 border-welfare-500/40 text-welfare-700 hover:bg-welfare-500 hover:text-white"
+                          >
+                            <MessageCircle className="size-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => {
+                              void navigator.clipboard?.writeText(a.trackingCode).catch(() => {});
+                              setCopiedCode(a.trackingCode);
+                              setTimeout(
+                                () => setCopiedCode((c) => (c === a.trackingCode ? null : c)),
+                                1600
+                              );
+                            }}
+                            aria-label={`Copy tracking code ${a.trackingCode}`}
+                            className="size-9 border-navy-200 text-navy-700 hover:bg-navy-900 hover:text-white"
+                          >
+                            {copiedCode === a.trackingCode ? (
+                              <Check className="size-4 text-welfare-600" />
+                            ) : (
+                              <Copy className="size-4" />
+                            )}
+                          </Button>
                           {savingCode === a.trackingCode ? (
                             <Loader2 className="mr-1 size-4.5 animate-spin text-navy-600" />
                           ) : null}
@@ -1133,7 +1360,7 @@ export function AdminConsole() {
                   Announcements show under “Latest updates &amp; events” on the website — pinned items appear first.
                 </p>
               </div>
-            ) : (
+            ) : tab === "testimonials" ? (
               /* ============ TESTIMONIALS (STUDENT VOICES) TAB ============ */
               <div>
                 {/* Compose / Edit */}
@@ -1366,6 +1593,82 @@ export function AdminConsole() {
 
                 <p className="mt-3 text-center text-[11px] text-muted-foreground">
                   Published testimonials replace the curated quotes in the “Student Voices” section instantly.
+                </p>
+              </div>
+            ) : (
+              /* ============ SETTINGS TAB ============ */
+              <div>
+                <div className="rounded-xl border border-border bg-navy-50/50 p-4">
+                  <p className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.2em] text-navy-800">
+                    <CalendarClock className="size-4 text-brand-red" /> Admission deadline &amp; countdown
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Set the Fall 2026 application deadline — a live countdown appears in the
+                    “Your seat is waiting” banner on the homepage. Clear the date to hide it.
+                  </p>
+                  <div className="mt-4 flex flex-wrap items-end gap-3">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="set-deadline" className="text-xs font-bold">Deadline date</Label>
+                      <Input
+                        id="set-deadline"
+                        type="date"
+                        value={deadline}
+                        onChange={(e) => {
+                          setDeadline(e.target.value);
+                          setDeadlineMsg(null);
+                        }}
+                        className="h-10 w-[180px] rounded-xl text-sm"
+                      />
+                    </div>
+                    <Button
+                      onClick={() => void saveDeadline(deadline)}
+                      disabled={deadlineSaving || !deadline}
+                      className="h-10 rounded-xl bg-gradient-to-r from-navy-900 to-navy-800 px-5 text-sm font-extrabold text-white shadow-lg hover:shadow-xl disabled:opacity-60"
+                    >
+                      {deadlineSaving ? (
+                        <>
+                          <Loader2 className="size-4 animate-spin" /> Saving…
+                        </>
+                      ) : (
+                        <>
+                          <Check className="size-4" /> Save
+                        </>
+                      )}
+                    </Button>
+                    {deadline && (
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setDeadline("");
+                          void saveDeadline("");
+                        }}
+                        disabled={deadlineSaving}
+                        className="h-10 rounded-xl border-brand-red/25 px-4 text-sm font-bold text-brand-red hover:bg-brand-red hover:text-white"
+                      >
+                        <X className="size-4" /> Clear
+                      </Button>
+                    )}
+                  </div>
+                  {deadlineMsg && (
+                    <p
+                      className={cn(
+                        "mt-3 rounded-lg px-3 py-2 text-xs font-bold",
+                        deadlineMsg.startsWith("✓")
+                          ? "bg-welfare-500/10 text-welfare-700"
+                          : "bg-brand-red/10 text-brand-red"
+                      )}
+                    >
+                      {deadlineMsg}
+                    </p>
+                  )}
+                  <p className="mt-3 text-[11px] text-muted-foreground">
+                    {deadline
+                      ? `Countdown is live — applications close ${new Date(`${deadline}T12:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}.`
+                      : "No deadline set — the countdown is currently hidden on the website."}
+                  </p>
+                </div>
+                <p className="mt-3 text-center text-[11px] text-muted-foreground">
+                  More site settings will appear here as the console grows.
                 </p>
               </div>
             )}
