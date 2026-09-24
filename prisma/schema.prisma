@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Admission {
+  id            String   @id @default(cuid())
+  trackingCode  String   @unique
+  fullName      String
+  fatherName    String
+  email         String?
+  phone         String
+  program       String
+  qualification String
+  lastMarks     String?
+  city          String
+  isWelfare     Boolean  @default(false)
+  message       String?
+  status        String   @default("PENDING") // PENDING | CONTACTED | APPROVED | REJECTED
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
