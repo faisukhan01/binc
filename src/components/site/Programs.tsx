@@ -33,7 +33,7 @@ export function Programs() {
               <motion.article
                 whileHover={{ y: -10 }}
                 transition={{ type: "spring", stiffness: 260, damping: 22 }}
-                className="group flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-white shadow-lg shadow-navy-900/8 transition-shadow duration-300 hover:shadow-2xl hover:shadow-navy-900/20"
+                className="group card-shine flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-white shadow-lg shadow-navy-900/8 transition-shadow duration-300 hover:shadow-2xl hover:shadow-navy-900/20"
               >
                 {/* Poster */}
                 <div className="relative overflow-hidden">

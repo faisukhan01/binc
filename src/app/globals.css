@@ -194,3 +194,66 @@ section[id] {
 .marquee-track:hover {
   animation-play-state: paused;
 }
+
+/* Accessible focus rings */
+:focus-visible {
+  outline: 2px solid #f0b429;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Card shine sweep on hover */
+.card-shine {
+  position: relative;
+  overflow: hidden;
+}
+.card-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 60%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.9s ease;
+  pointer-events: none;
+}
+.card-shine:hover::after {
+  transform: translateX(120%);
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print styles — application confirmation */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #apply,
+  #apply * {
+    visibility: visible;
+  }
+  #apply {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    box-shadow: none !important;
+  }
+  #apply button,
+  #apply a {
+    display: none !important;
+  }
+}

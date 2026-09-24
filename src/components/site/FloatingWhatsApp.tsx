@@ -22,7 +22,7 @@ export function FloatingWhatsApp() {
   }, []);
 
   return (
-    <div className="fixed bottom-5 right-4 z-[55] flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">
+    <div className="fixed bottom-[76px] right-4 z-[55] flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">
       {/* Chat bubble */}
       <AnimatePresence>
         {banner && (

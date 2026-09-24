@@ -15,6 +15,7 @@ import {
   Mail,
   MapPin,
   Phone,
+  Printer,
   Send,
   Youtube,
 } from "lucide-react";
@@ -33,6 +34,7 @@ import {
 } from "@/components/ui/select";
 import { PROGRAMS, SITE } from "@/lib/site-data";
 import { Reveal, SectionHeading } from "./Reveal";
+import { StatusTracker } from "./StatusTracker";
 
 const formSchema = z.object({
   fullName: z.string().min(3, "Please enter your full name"),
@@ -283,6 +285,12 @@ export function Contact() {
                         {copied ? <CheckCircle2 className="size-4 text-welfare-500" /> : <Copy className="size-4" />}
                       </Button>
                     </div>
+                    <button
+                      onClick={() => window.print()}
+                      className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-navy-800 underline-offset-4 hover:underline"
+                    >
+                      <Printer className="size-3.5" /> Print confirmation
+                    </button>
                   </div>
                   <div className="mt-8 flex flex-wrap justify-center gap-3">
                     <a
@@ -430,7 +438,67 @@ export function Contact() {
             </div>
           </Reveal>
         </div>
+
+        {/* Application status tracker */}
+        <div className="mt-8 grid gap-7 lg:grid-cols-[0.9fr_1.1fr]" id="track">
+          <StatusTracker />
+          <QuickHelp />
+        </div>
       </div>
     </section>
+  );
+}
+
+function QuickHelp() {
+  return (
+    <Reveal delay={0.12}>
+      <div className="relative flex h-full flex-col overflow-hidden rounded-3xl bg-gradient-to-br from-navy-900 via-navy-850 to-navy-800 p-6 sm:p-8">
+        <div
+          className="absolute inset-0 opacity-[0.08]"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(45deg, transparent 0 30px, rgba(255,215,90,.6) 30px 31px)",
+          }}
+        />
+        <h3 className="relative font-display text-2xl font-black text-white">
+          Admission Desk — We reply fast
+        </h3>
+        <p className="relative mt-2 text-sm leading-relaxed text-navy-100/85">
+          Lost your tracking code? Need fee details, eligibility check or welfare
+          verification? Our admissions office is one message away.
+        </p>
+
+        <div className="relative mt-6 grid gap-3">
+          <a
+            href={`https://wa.me/${SITE.whatsappIntl}?text=Hi! I need help with my admission application.`}
+            target="_blank"
+            rel="noreferrer"
+            className="flex min-h-[56px] items-center justify-between rounded-2xl bg-welfare-500 px-5 py-3.5 font-extrabold text-white shadow-lg shadow-welfare-900/30 transition-transform hover:-translate-y-0.5"
+          >
+            <span className="flex items-center gap-2.5">
+              <svg viewBox="0 0 24 24" className="size-6 fill-white" aria-hidden>
+                <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm5.83 14.12c-.25.7-1.45 1.33-2.02 1.42-.52.08-1.17.11-1.89-.12-.44-.14-1-.32-1.71-.63-3.02-1.3-4.99-4.34-5.14-4.54-.15-.2-1.23-1.63-1.23-3.11 0-1.48.78-2.21 1.05-2.51.28-.3.6-.38.8-.38.2 0 .4 0 .58.01.19.01.44-.07.68.52.25.6.85 2.07.92 2.22.08.15.13.33.02.53-.1.2-.15.32-.3.5-.15.17-.31.39-.45.52-.15.15-.3.31-.13.61.18.3.78 1.28 1.67 2.08 1.15 1.02 2.12 1.34 2.42 1.49.3.15.48.13.65-.08.18-.2.75-.87.95-1.17.2-.3.4-.25.68-.15.28.1 1.75.83 2.05.98.3.15.5.22.58.35.07.12.07.72-.18 1.42z" />
+              </svg>
+              WhatsApp Admission Desk
+            </span>
+            <span className="font-display">{SITE.whatsapp}</span>
+          </a>
+          <a
+            href={`tel:${SITE.phone}`}
+            className="flex min-h-[56px] items-center justify-between rounded-2xl border border-white/15 bg-white/8 px-5 py-3.5 font-extrabold text-white transition-colors hover:bg-white/15"
+          >
+            <span className="flex items-center gap-2.5">
+              <Phone className="size-5 text-gold-400" /> Call Campus Office
+            </span>
+            <span className="font-display">{SITE.phone}</span>
+          </a>
+          <div className="mt-1 flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-navy-100/60">
+            <span className="size-1.5 rounded-full bg-welfare-500" />
+            Mon – Sat · 9:00 AM – 5:00 PM
+            <span className="size-1.5 rounded-full bg-welfare-500" />
+          </div>
+        </div>
+      </div>
+    </Reveal>
   );
 }

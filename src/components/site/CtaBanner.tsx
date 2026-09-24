@@ -1,11 +1,27 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, RadioTower, Sparkles } from "lucide-react";
 import { Reveal } from "./Reveal";
 import { SITE } from "@/lib/site-data";
 
 export function CtaBanner() {
+  const [total, setTotal] = useState<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/admissions")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!cancelled && d?.ok && typeof d.total === "number") setTotal(d.total);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <section aria-label="Admissions call to action" className="relative bg-white py-14 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -38,6 +54,28 @@ export function CtaBanner() {
               Applications for Fall 2026 are open with limited seats per program.
               Apply online today — or WhatsApp us for instant guidance.
             </p>
+
+            {/* Live applications counter */}
+            {total !== null && total > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.15 }}
+                className="relative mx-auto mt-5 inline-flex items-center gap-2.5 rounded-full border border-gold-400/30 bg-gold-400/10 px-4 py-2"
+              >
+                <span className="relative flex size-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-welfare-500 opacity-80" />
+                  <span className="relative inline-flex size-2 rounded-full bg-welfare-500" />
+                </span>
+                <span className="text-xs font-bold text-gold-300 sm:text-sm">
+                  <RadioTower className="mr-1.5 inline size-3.5" />
+                  Live · {total} application{total === 1 ? "" : "s"} already received for Fall
+                  2026
+                </span>
+              </motion.div>
+            )}
+
             <div className="relative mt-8 flex flex-wrap items-center justify-center gap-3.5">
               <a
                 href="#apply"
