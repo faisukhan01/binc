@@ -2,6 +2,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { Hero } from "@/components/site/Hero";
 import { MarqueeStrip } from "@/components/site/MarqueeStrip";
 import { About } from "@/components/site/About";
+import { Announcements } from "@/components/site/Announcements";
 import { Programs } from "@/components/site/Programs";
 import { Welfare } from "@/components/site/Welfare";
 import { Fees } from "@/components/site/Fees";
@@ -71,6 +72,7 @@ export default function Home() {
         <Hero />
         <MarqueeStrip />
         <About />
+        <Announcements />
         <Programs />
         <Welfare />
         <Fees />

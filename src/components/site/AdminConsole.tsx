@@ -8,18 +8,26 @@ import {
   Download,
   GraduationCap,
   KeyRound,
-  LockKeyhole,
   Loader2,
+  LockKeyhole,
   LogOut,
+  Megaphone,
+  Newspaper,
+  Pin,
+  Plus,
   RefreshCw,
   Search,
   ShieldCheck,
+  Trash2,
   Users,
   XCircle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -57,6 +65,15 @@ interface ProgramCount {
   count: number;
 }
 
+interface AnnouncementItem {
+  id: string;
+  title: string;
+  body: string;
+  tag: string;
+  pinned: boolean;
+  createdAt: string;
+}
+
 interface AdminStats {
   total: number;
   pending: number;
@@ -89,6 +106,15 @@ export function AdminConsole() {
   const [query, setQuery] = useState("");
   const [savingCode, setSavingCode] = useState<string | null>(null);
   const [booted, setBooted] = useState(false);
+  const [tab, setTab] = useState<"applications" | "announcements">("applications");
+  const [announcements, setAnnouncements] = useState<AnnouncementItem[]>([]);
+  const [annLoading, setAnnLoading] = useState(false);
+  const [annTitle, setAnnTitle] = useState("");
+  const [annBody, setAnnBody] = useState("");
+  const [annTag, setAnnTag] = useState("Notice");
+  const [annPinned, setAnnPinned] = useState(false);
+  const [annSaving, setAnnSaving] = useState(false);
+  const [annError, setAnnError] = useState<string | null>(null);
 
   // Open via footer event
   useEffect(() => {
@@ -123,6 +149,7 @@ export function AdminConsole() {
         setStats(data.stats);
         setByProgram(data.byProgram ?? []);
         setAuthed(true);
+        void loadAnnouncements();
       } catch {
         setError("Network error — please try again");
       } finally {
@@ -188,8 +215,61 @@ export function AdminConsole() {
     setApps([]);
     setStats(null);
     setByProgram([]);
+    setAnnouncements([]);
+    setTab("applications");
     setError(null);
   };
+
+  const loadAnnouncements = useCallback(async () => {
+    setAnnLoading(true);
+    try {
+      const res = await fetch("/api/announcements");
+      const data = await res.json();
+      if (res.ok) setAnnouncements(data.announcements ?? []);
+    } finally {
+      setAnnLoading(false);
+    }
+  }, []);
+
+  const createAnnouncement = useCallback(async () => {
+    setAnnSaving(true);
+    setAnnError(null);
+    try {
+      const res = await fetch("/api/announcements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminKey, title: annTitle, body: annBody, tag: annTag, pinned: annPinned }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setAnnError(data.error || "Could not publish announcement");
+        return;
+      }
+      setAnnouncements((list) => [data.announcement, ...list]);
+      setAnnTitle("");
+      setAnnBody("");
+      setAnnTag("Notice");
+      setAnnPinned(false);
+    } catch {
+      setAnnError("Network error — please try again");
+    } finally {
+      setAnnSaving(false);
+    }
+  }, [adminKey, annTitle, annBody, annTag, annPinned]);
+
+  const deleteAnnouncement = useCallback(
+    async (id: string) => {
+      try {
+        const res = await fetch(`/api/announcements?adminKey=${encodeURIComponent(adminKey)}&id=${encodeURIComponent(id)}`, {
+          method: "DELETE",
+        });
+        if (res.ok) setAnnouncements((list) => list.filter((a) => a.id !== id));
+      } catch {
+        /* keep row on failure */
+      }
+    },
+    [adminKey]
+  );
 
   /** Export the (filtered) application list as a CSV download */
   const exportCsv = () => {
@@ -296,6 +376,34 @@ export function AdminConsole() {
           </form>
         ) : (
           <div className="px-5 py-5 sm:px-6">
+            {/* Tabs */}
+            <div
+              className="mb-5 grid grid-cols-2 gap-1 rounded-xl bg-navy-50 p-1"
+              role="tablist"
+              aria-label="Console sections"
+            >
+              {([
+                { id: "applications", label: "Applications", icon: Users },
+                { id: "announcements", label: "Announcements", icon: Megaphone },
+              ] as const).map((t) => (
+                <button
+                  key={t.id}
+                  role="tab"
+                  aria-selected={tab === t.id}
+                  onClick={() => setTab(t.id)}
+                  className={`inline-flex min-h-[40px] items-center justify-center gap-2 rounded-lg text-sm font-extrabold transition-all ${
+                    tab === t.id
+                      ? "bg-white text-navy-900 shadow-sm"
+                      : "text-muted-foreground hover:text-navy-800"
+                  }`}
+                >
+                  <t.icon className="size-4" /> {t.label}
+                </button>
+              ))}
+            </div>
+
+            {tab === "applications" ? (
+            <>
             {/* Stats */}
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
               {[
@@ -480,6 +588,157 @@ export function AdminConsole() {
             <p className="mt-3 text-center text-[11px] text-muted-foreground">
               Status changes reflect instantly on the applicant&apos;s tracking timeline.
             </p>
+            </>
+            ) : (
+              /* ============ ANNOUNCEMENTS TAB ============ */
+              <div>
+                {/* Compose */}
+                <div className="rounded-xl border border-border bg-navy-50/50 p-4">
+                  <p className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.2em] text-navy-800">
+                    <Newspaper className="size-4 text-brand-red" /> Publish to the website notice board
+                  </p>
+                  <div className="mt-3 grid gap-3">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="ann-title" className="text-xs font-bold">Title *</Label>
+                      <Input
+                        id="ann-title"
+                        value={annTitle}
+                        onChange={(e) => setAnnTitle(e.target.value)}
+                        placeholder="e.g. Fall 2026 admissions close on 30 September"
+                        maxLength={140}
+                        className="rounded-xl text-sm"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="ann-body" className="text-xs font-bold">Details *</Label>
+                      <Textarea
+                        id="ann-body"
+                        value={annBody}
+                        onChange={(e) => setAnnBody(e.target.value)}
+                        placeholder="Short announcement shown on the website notice board…"
+                        rows={3}
+                        maxLength={2000}
+                        className="rounded-xl text-sm"
+                      />
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-bold">Tag</Label>
+                        <Select value={annTag} onValueChange={setAnnTag}>
+                          <SelectTrigger className="h-9 w-[130px] rounded-lg text-xs font-bold" aria-label="Announcement tag">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {["Notice", "Event", "Deadline", "Result"].map((t) => (
+                              <SelectItem key={t} value={t} className="text-xs font-bold">{t}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <label
+                        htmlFor="ann-pinned"
+                        className="mt-4 flex cursor-pointer items-center gap-2 rounded-lg border border-gold-400/40 bg-gold-400/10 px-3 py-2"
+                      >
+                        <Checkbox
+                          id="ann-pinned"
+                          checked={annPinned}
+                          onCheckedChange={(v) => setAnnPinned(v === true)}
+                          className="size-4"
+                        />
+                        <span className="flex items-center gap-1.5 text-xs font-extrabold text-gold-600">
+                          <Pin className="size-3.5" /> Pin to top
+                        </span>
+                      </label>
+                      <Button
+                        onClick={() => void createAnnouncement()}
+                        disabled={annSaving || annTitle.trim().length < 4 || annBody.trim().length < 10}
+                        className="mt-4 ml-auto min-h-[40px] rounded-xl bg-gradient-to-r from-navy-900 to-navy-800 px-5 text-sm font-extrabold text-white shadow-lg hover:shadow-xl disabled:opacity-60"
+                      >
+                        {annSaving ? (
+                          <>
+                            <Loader2 className="size-4 animate-spin" /> Publishing…
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="size-4" /> Publish
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    {annError && (
+                      <p className="rounded-lg bg-brand-red/10 px-3 py-2 text-xs font-bold text-brand-red">{annError}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* List */}
+                <div className="mt-4 max-h-[42vh] overflow-y-auto rounded-xl border border-border">
+                  {annLoading ? (
+                    <div className="flex items-center justify-center gap-2 py-12 text-sm font-bold text-muted-foreground">
+                      <Loader2 className="size-4.5 animate-spin" /> Loading…
+                    </div>
+                  ) : announcements.length === 0 ? (
+                    <div className="grid place-items-center gap-2 py-14 text-center">
+                      <Megaphone className="size-9 text-navy-200" />
+                      <p className="text-sm font-bold text-navy-900">No announcements yet</p>
+                      <p className="text-xs text-muted-foreground">
+                        Published announcements appear on the website notice board instantly.
+                      </p>
+                    </div>
+                  ) : (
+                    <ul className="divide-y divide-border">
+                      <AnimatePresence initial={false}>
+                        {announcements.map((a) => (
+                          <motion.li
+                            key={a.id}
+                            layout
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="flex items-start justify-between gap-3 p-4 transition-colors hover:bg-navy-50/60"
+                          >
+                            <div className="min-w-0">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="rounded-full bg-navy-50 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-navy-800 ring-1 ring-navy-100">
+                                  {a.tag}
+                                </span>
+                                {a.pinned && (
+                                  <span className="inline-flex items-center gap-1 rounded-full bg-gold-400/15 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-gold-600 ring-1 ring-gold-400/40">
+                                    <Pin className="size-3" /> Pinned
+                                  </span>
+                                )}
+                                <span className="text-[11px] font-semibold text-muted-foreground">
+                                  {new Date(a.createdAt).toLocaleDateString("en-GB", {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                  })}
+                                </span>
+                              </div>
+                              <p className="mt-1 text-sm font-extrabold text-navy-900">{a.title}</p>
+                              <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{a.body}</p>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => void deleteAnnouncement(a.id)}
+                              aria-label={`Delete announcement: ${a.title}`}
+                              className="size-9 shrink-0 border-brand-red/25 text-brand-red hover:bg-brand-red hover:text-white"
+                            >
+                              <Trash2 className="size-4" />
+                            </Button>
+                          </motion.li>
+                        ))}
+                      </AnimatePresence>
+                    </ul>
+                  )}
+                </div>
+
+                <p className="mt-3 text-center text-[11px] text-muted-foreground">
+                  Announcements show under “Latest updates &amp; events” on the website — pinned items appear first.
+                </p>
+              </div>
+            )}
           </div>
         )}
       </DialogContent>

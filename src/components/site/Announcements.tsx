@@ -1,0 +1,120 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { CalendarDays, Megaphone, Pin } from "lucide-react";
+import { Reveal, SectionHeading } from "./Reveal";
+
+interface Announcement {
+  id: string;
+  title: string;
+  body: string;
+  tag: string;
+  pinned: boolean;
+  createdAt: string;
+}
+
+const TAG_STYLES: Record<string, { chip: string; dot: string }> = {
+  Notice: { chip: "bg-navy-50 text-navy-800 ring-navy-200/60", dot: "bg-navy-700" },
+  Event: { chip: "bg-gold-400/15 text-gold-600 ring-gold-400/40", dot: "bg-gold-500" },
+  Deadline: { chip: "bg-brand-red/10 text-brand-red ring-brand-red/30", dot: "bg-brand-red" },
+  Result: { chip: "bg-welfare-500/12 text-welfare-700 ring-welfare-500/30", dot: "bg-welfare-500" },
+};
+
+export function Announcements() {
+  const [items, setItems] = useState<Announcement[] | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/announcements")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("failed"))))
+      .then((d) => {
+        if (alive) setItems(d.announcements ?? []);
+      })
+      .catch(() => {
+        if (alive) setItems([]);
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  // Section stays completely hidden until staff publish something
+  if (!items || items.length === 0) return null;
+
+  return (
+    <section id="news" className="relative overflow-hidden bg-white py-20 sm:py-28">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-60"
+        style={{
+          backgroundImage:
+            "radial-gradient(ellipse 55% 45% at 85% 10%, rgba(199,25,32,.06), transparent), radial-gradient(ellipse 50% 40% at 10% 90%, rgba(217,166,46,.08), transparent)",
+        }}
+      />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+        <SectionHeading
+          kicker="Notice Board"
+          title={
+            <>
+              Latest <span className="text-gradient-navy-red">updates &amp; events</span>
+            </>
+          }
+          subtitle="Announcements from the admissions office — deadlines, events and results, straight from campus."
+        />
+
+        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {items.map((a, i) => {
+            const tag = TAG_STYLES[a.tag] ?? TAG_STYLES.Notice;
+            return (
+              <Reveal key={a.id} delay={0.06 * i} className="h-full">
+                <motion.article
+                  whileHover={{ y: -6 }}
+                  transition={{ type: "spring", stiffness: 260, damping: 22 }}
+                  className="card-shine group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-white p-5 shadow-md shadow-navy-900/6 transition-shadow duration-300 hover:shadow-xl hover:shadow-navy-900/15"
+                >
+                  {a.pinned && (
+                    <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-gold-400/15 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-gold-600 ring-1 ring-gold-400/40">
+                      <Pin className="size-3" /> Pinned
+                    </span>
+                  )}
+
+                  <div className="flex items-center gap-2.5">
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider ring-1 ${tag.chip}`}
+                    >
+                      <span className={`size-1.5 rounded-full ${tag.dot}`} />
+                      {a.tag}
+                    </span>
+                  </div>
+
+                  <h3 className="mt-3.5 font-display text-lg font-black leading-snug text-navy-950 transition-colors group-hover:text-brand-red">
+                    {a.title}
+                  </h3>
+                  <p className="mt-2 line-clamp-4 text-sm leading-relaxed text-muted-foreground">
+                    {a.body}
+                  </p>
+
+                  <p className="mt-auto flex items-center gap-1.5 pt-4 text-[11px] font-bold uppercase tracking-wider text-muted-foreground/80">
+                    <CalendarDays className="size-3.5 text-navy-400" />
+                    {new Date(a.createdAt).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </p>
+                </motion.article>
+              </Reveal>
+            );
+          })}
+        </div>
+
+        <Reveal delay={0.15}>
+          <p className="mt-8 flex items-center justify-center gap-2 text-center text-xs font-semibold text-muted-foreground">
+            <Megaphone className="size-4 text-brand-red" />
+            Posted by the Bright International College admissions office
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}

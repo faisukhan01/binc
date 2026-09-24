@@ -11,12 +11,40 @@ import { cn } from "@/lib/utils";
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [active, setActive] = useState<string>("#home");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Scrollspy — highlight the nav link of the section currently in view
+  useEffect(() => {
+    const ids = NAV_LINKS.map((l) => l.href.slice(1));
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const mid = window.innerHeight * 0.35;
+        let current = `#${ids[0]}`;
+        for (const id of ids) {
+          const el = document.getElementById(id);
+          if (el && el.getBoundingClientRect().top <= mid) current = `#${id}`;
+        }
+        if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) {
+          current = `#${ids[ids.length - 1]}`;
+        }
+        setActive(current);
+      });
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
   }, []);
 
   useEffect(() => {
@@ -100,13 +128,24 @@ export function Navbar() {
                 <a
                   key={l.href}
                   href={l.href}
+                  aria-current={l.href === active ? "true" : undefined}
                   className={cn(
-                    "relative rounded-lg px-2 py-2 text-[13px] font-semibold text-navy-850/80 hover:text-navy-950 hover:bg-navy-50 transition-colors group xl:px-2.5 xl:text-sm",
+                    "relative rounded-lg px-2 py-2 text-[13px] font-semibold transition-colors group xl:px-2.5 xl:text-sm",
+                    l.href === active
+                      ? "text-navy-950 bg-navy-50"
+                      : "text-navy-850/80 hover:text-navy-950 hover:bg-navy-50/70",
                     (l.href === "#campus" || l.href === "#gallery") && "hidden xl:block"
                   )}
                 >
                   {l.label}
-                  <span className="absolute inset-x-2.5 -bottom-px h-0.5 bg-gradient-to-r from-brand-red to-gold-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 rounded-full" />
+                  <span
+                    className={cn(
+                      "absolute inset-x-2.5 -bottom-px h-0.5 rounded-full bg-gradient-to-r from-brand-red to-gold-500 transition-transform duration-300",
+                      l.href === active
+                        ? "scale-x-100"
+                        : "scale-x-0 group-hover:scale-x-100"
+                    )}
+                  />
                 </a>
               ))}
             </div>
@@ -188,10 +227,21 @@ export function Navbar() {
                     initial={{ opacity: 0, x: 24 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.05 + i * 0.05 }}
-                    className="flex items-center justify-between rounded-xl px-4 py-3.5 text-base font-semibold text-navy-850 hover:bg-navy-50 active:bg-navy-100 transition-colors"
+                    aria-current={l.href === active ? "true" : undefined}
+                    className={cn(
+                      "flex items-center justify-between rounded-xl px-4 py-3.5 text-base font-semibold transition-colors",
+                      l.href === active
+                        ? "bg-navy-50 text-navy-950"
+                        : "text-navy-850 hover:bg-navy-50 active:bg-navy-100"
+                    )}
                   >
                     {l.label}
-                    <span className="size-1.5 rounded-full bg-gold-500" />
+                    <span
+                      className={cn(
+                        "size-1.5 rounded-full",
+                        l.href === active ? "bg-brand-red" : "bg-gold-500"
+                      )}
+                    />
                   </motion.a>
                 ))}
               </nav>

@@ -1,13 +1,19 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "@prisma/client";
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
-}
+/**
+ * Prisma singleton with a schema-version tag.
+ * Bump PRISMA_TAG whenever prisma/schema.prisma changes + `prisma generate`
+ * re-runs, so a stale globalThis client (missing new models) is never reused.
+ */
+const PRISMA_TAG = "v2-announcement";
+
+const g = globalThis as unknown as {
+  __prisma?: PrismaClient;
+  __prismaTag?: string;
+};
 
 export const db =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log: ['query'],
-  })
+  g.__prisma && g.__prismaTag === PRISMA_TAG ? g.__prisma : new PrismaClient();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db
+g.__prisma = db;
+g.__prismaTag = PRISMA_TAG;
