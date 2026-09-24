@@ -15,6 +15,12 @@ const createSchema = z.object({
   body: z.string().trim().min(10).max(2000),
   tag: z.enum(["Notice", "Event", "Deadline", "Result"]).default("Notice"),
   pinned: z.boolean().optional().default(false),
+  imageUrl: z
+    .string()
+    .trim()
+    .max(500)
+    .refine((v) => v === "" || /^https?:\/\/|^\/uploads\//.test(v), "Must be an http(s) URL or an /uploads/ path")
+    .optional(),
 });
 
 const deleteSchema = z.object({
@@ -29,6 +35,12 @@ const patchSchema = z.object({
   body: z.string().trim().min(10).max(2000),
   tag: z.enum(["Notice", "Event", "Deadline", "Result"]),
   pinned: z.boolean(),
+  imageUrl: z
+    .string()
+    .trim()
+    .max(500)
+    .refine((v) => v === "" || /^https?:\/\/|^\/uploads\//.test(v), "Must be an http(s) URL or an /uploads/ path")
+    .optional(),
 });
 
 function isAuthed(key: string | null): boolean {
@@ -70,6 +82,9 @@ export async function POST(req: NextRequest) {
         body: parsed.data.body,
         tag: parsed.data.tag,
         pinned: parsed.data.pinned,
+        ...(parsed.data.imageUrl !== undefined
+          ? { imageUrl: parsed.data.imageUrl || null }
+          : {}),
       },
     });
     return NextResponse.json({ ok: true, announcement }, { status: 201 });
@@ -106,6 +121,9 @@ export async function PATCH(req: NextRequest) {
         body: parsed.data.body,
         tag: parsed.data.tag,
         pinned: parsed.data.pinned,
+        ...(parsed.data.imageUrl !== undefined
+          ? { imageUrl: parsed.data.imageUrl || null }
+          : {}),
       },
     });
     return NextResponse.json({ ok: true, announcement });

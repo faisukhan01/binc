@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { CalendarDays, Megaphone, Pin } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { CalendarDays, ImageIcon, Megaphone, Pin, X } from "lucide-react";
 import { Reveal, SectionHeading } from "./Reveal";
 
 interface Announcement {
@@ -11,6 +11,7 @@ interface Announcement {
   body: string;
   tag: string;
   pinned: boolean;
+  imageUrl?: string | null;
   createdAt: string;
 }
 
@@ -42,6 +43,15 @@ export function Announcements() {
   const [items, setItems] = useState<Announcement[] | null>(null);
   // Skeleton appears only if the fetch is still pending after 350ms (avoids flicker on fast loads)
   const [showSkeleton, setShowSkeleton] = useState(false);
+  const [viewing, setViewing] = useState<{ url: string; title: string } | null>(null);
+
+  // Escape closes the image lightbox
+  useEffect(() => {
+    if (!viewing) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setViewing(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [viewing]);
 
   useEffect(() => {
     const t = setTimeout(() => setShowSkeleton(true), 350);
@@ -141,6 +151,26 @@ export function Announcements() {
                     )}
                   </div>
 
+                  {a.imageUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setViewing({ url: a.imageUrl!, title: a.title })}
+                      aria-label={`View image: ${a.title}`}
+                      className="group/img relative mt-3.5 block w-full overflow-hidden rounded-xl ring-1 ring-navy-100 focus-visible:ring-2 focus-visible:ring-gold-500"
+                    >
+                      <img
+                        src={a.imageUrl}
+                        alt=""
+                        loading="lazy"
+                        className="aspect-[16/9] w-full object-cover transition-transform duration-500 group-hover/img:scale-[1.04]"
+                      />
+                      <span className="absolute inset-0 bg-gradient-to-t from-navy-950/45 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover/img:opacity-100" />
+                      <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1.5 rounded-full bg-white/92 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-navy-900 opacity-0 shadow-md backdrop-blur transition-opacity duration-300 group-hover/img:opacity-100">
+                        <ImageIcon className="size-3 text-brand-red" /> View
+                      </span>
+                    </button>
+                  )}
+
                   <h3 className="mt-3.5 font-display text-lg font-black leading-snug text-navy-950 transition-colors group-hover:text-brand-red">
                     {a.title}
                   </h3>
@@ -173,6 +203,48 @@ export function Announcements() {
           </Reveal>
         )}
       </div>
+
+      {/* Image lightbox */}
+      <AnimatePresence>
+        {viewing && (
+          <motion.div
+            key="ann-lightbox"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[90] flex items-center justify-center bg-navy-950/85 p-4 backdrop-blur-md"
+            onClick={() => setViewing(null)}
+            role="dialog"
+            aria-modal="true"
+            aria-label={viewing.title}
+          >
+            <motion.figure
+              initial={{ scale: 0.9, y: 24 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.92, y: 16 }}
+              transition={{ type: "spring", damping: 24, stiffness: 260 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative max-h-[88vh] w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+            >
+              <img
+                src={viewing.url}
+                alt={viewing.title}
+                className="max-h-[76vh] w-full bg-navy-50 object-contain"
+              />
+              <figcaption className="flex items-center justify-between gap-3 border-t border-border px-4 py-3">
+                <span className="truncate text-sm font-extrabold text-navy-900">{viewing.title}</span>
+                <button
+                  onClick={() => setViewing(null)}
+                  aria-label="Close image view"
+                  className="grid size-9 shrink-0 place-items-center rounded-full bg-navy-50 text-navy-800 transition-colors hover:bg-brand-red hover:text-white"
+                >
+                  <X className="size-4.5" />
+                </button>
+              </figcaption>
+            </motion.figure>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

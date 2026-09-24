@@ -101,11 +101,11 @@ export function Navbar() {
       >
         <div className="mx-auto max-w-7xl px-4">
           <nav
-            className="flex items-center justify-between gap-4 py-2.5"
+            className="flex items-center justify-between gap-3 py-2.5"
             aria-label="Main navigation"
           >
             {/* Brand */}
-            <a href="#home" className="flex items-center gap-3 group min-w-0">
+            <a href="#home" className="flex items-center gap-2.5 group min-w-0">
               <span className="relative shrink-0">
                 <Image
                   src="/images/logo.jpg"
@@ -118,10 +118,10 @@ export function Navbar() {
                 <span className="absolute -inset-1 rounded-full bg-gradient-to-tr from-gold-400/0 via-gold-400/40 to-brand-red/0 opacity-0 group-hover:opacity-100 blur-md transition-opacity duration-500 -z-10" />
               </span>
               <span className="leading-tight min-w-0">
-                <span className="block font-display font-extrabold text-navy-850 text-base sm:text-lg tracking-tight truncate">
+                <span className="block font-display font-extrabold text-navy-850 text-[15px] sm:text-lg tracking-tight truncate rtl:text-sm sm:rtl:text-base rtl:tracking-normal">
                   BRIGHT <span className="text-brand-red">INTERNATIONAL</span> COLLEGE
                 </span>
-                <span className="block text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.22em] text-gold-600">
+                <span className="block text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.22em] text-gold-600 rtl:tracking-[0.08em]">
                   {isUr ? SITE.taglineUr : "Excellence in Education"}
                 </span>
               </span>

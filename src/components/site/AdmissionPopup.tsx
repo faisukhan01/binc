@@ -19,14 +19,22 @@ const SPARKS = [
 export function AdmissionPopup() {
   const [open, setOpen] = useState(false);
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
+  /** Staff-configurable behaviour from /api/settings (defaults = enabled, branded copy) */
+  const [enabled, setEnabled] = useState(true);
+  const [customTitle, setCustomTitle] = useState("");
+  const [customMessage, setCustomMessage] = useState("");
   const { isUr } = useT();
 
-  // Deadline awareness — staff-configured countdown from /api/settings
+  // Staff settings — deadline countdown, popup on/off, custom copy overrides
   useEffect(() => {
     fetch("/api/settings")
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
-        const dl = d?.settings?.admissionDeadline;
+        const s = d?.settings ?? {};
+        if (s.popupEnabled === "off") setEnabled(false);
+        if (s.popupTitle) setCustomTitle(String(s.popupTitle));
+        if (s.popupMessage) setCustomMessage(String(s.popupMessage));
+        const dl = s.admissionDeadline;
         if (!dl) return;
         const ms = new Date(`${dl}T23:59:59`).getTime() - Date.now();
         if (ms > 0) setDaysLeft(Math.ceil(ms / 86_400_000));
@@ -35,6 +43,7 @@ export function AdmissionPopup() {
   }, []);
 
   useEffect(() => {
+    if (!enabled) return;
     let timer: ReturnType<typeof setTimeout>;
     try {
       if (!sessionStorage.getItem("binc-popup-shown")) {
@@ -53,7 +62,7 @@ export function AdmissionPopup() {
       clearTimeout(timer);
       window.removeEventListener("keydown", onKey);
     };
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -106,7 +115,9 @@ export function AdmissionPopup() {
               </p>
               <h3 className="relative mt-2 font-display text-4xl font-black text-white sm:text-5xl">
                 {isUr ? UR.popup.titleA : "Admissions"}
-                <span className="block text-gradient-gold">{isUr ? UR.popup.titleB : "OPEN — Fall 26"}</span>
+                <span className="block text-gradient-gold">
+                  {customTitle || (isUr ? UR.popup.titleB : "OPEN — Fall 26")}
+                </span>
               </h3>
               {daysLeft !== null && (
                 <p className="relative mx-auto mt-3 inline-flex items-center gap-1.5 rounded-full bg-brand-red/90 px-3.5 py-1 text-[11px] font-extrabold text-white shadow-lg">
@@ -159,7 +170,10 @@ export function AdmissionPopup() {
               </div>
 
               <p className="mt-4 text-center text-sm leading-relaxed text-muted-foreground">
-                {isUr ? UR.popup.body : "Pharm-D · DPT · BSCS — apply online in under 2 minutes and our admissions team will call you back the same day."}
+                {customMessage ||
+                  (isUr
+                    ? UR.popup.body
+                    : "Pharm-D · DPT · BSCS — apply online in under 2 minutes and our admissions team will call you back the same day.")}
               </p>
 
               <div className="mt-5 grid gap-2.5">

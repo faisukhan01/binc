@@ -8,19 +8,20 @@ import { db } from "@/lib/db";
  */
 const ADMIN_PASSCODE = process.env.ADMIN_PASSCODE || "binc-admin-2026";
 
+/** Uploaded files live under /uploads/… — allow those alongside absolute http(s) URLs */
+const photoUrlSchema = z
+  .string()
+  .trim()
+  .max(500)
+  .refine((v) => v === "" || /^https?:\/\//.test(v) || v.startsWith("/uploads/"), "Must be an http(s) URL or an /uploads/ path");
+
 const createSchema = z.object({
   adminKey: z.string().min(1).max(100),
   name: z.string().trim().min(2).max(80),
   program: z.string().trim().min(2).max(80),
   quote: z.string().trim().min(20).max(800),
   rating: z.coerce.number().int().min(1).max(5).default(5),
-  photoUrl: z
-    .string()
-    .trim()
-    .max(500)
-    .refine((v) => v === "" || /^https?:\/\//.test(v), "Must be an http(s) URL")
-    .optional()
-    .or(z.literal("")),
+  photoUrl: photoUrlSchema.optional().or(z.literal("")),
   pinned: z.boolean().optional().default(false),
 });
 
@@ -31,13 +32,13 @@ const updateSchema = z.object({
   program: z.string().trim().min(2).max(80).optional(),
   quote: z.string().trim().min(20).max(800).optional(),
   rating: z.coerce.number().int().min(1).max(5).optional(),
-  photoUrl: z
-    .string()
-    .trim()
-    .max(500)
-    .refine((v) => v === "" || /^https?:\/\//.test(v), "Must be an http(s) URL")
-    .optional(),
+  photoUrl: photoUrlSchema.optional(),
   pinned: z.boolean().optional(),
+});
+
+const deleteSchema = z.object({
+  adminKey: z.string().min(1).max(100),
+  id: z.string().trim().min(5).max(50),
 });
 
 function isAuthed(key: string | null): boolean {

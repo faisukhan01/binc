@@ -8,19 +8,40 @@ import { db } from "@/lib/db";
  * PUT  — staff-only (adminKey body field, same passcode as the admin console).
  *
  * Supported keys:
- *  - admissionDeadline: "" | "YYYY-MM-DD" — public countdown on the CTA banner.
+ *  - admissionDeadline: "" | "YYYY-MM-DD"  — public countdown on the CTA banner.
+ *  - popupEnabled:      "on" | "off"       — homepage Fall 26 admission popup.
+ *  - popupTitle:        "" | custom text   — gold headline line inside the popup.
+ *  - popupMessage:      "" | custom text   — body paragraph inside the popup.
  */
 const ADMIN_PASSCODE = process.env.ADMIN_PASSCODE || "binc-admin-2026";
 
-const PUBLIC_KEYS = ["admissionDeadline"] as const;
+const PUBLIC_KEYS = [
+  "admissionDeadline",
+  "popupEnabled",
+  "popupTitle",
+  "popupMessage",
+] as const;
 type PublicSettingKey = (typeof PUBLIC_KEYS)[number];
 
-const putSchema = z.object({
-  adminKey: z.string().min(1).max(100),
-  admissionDeadline: z
-    .string()
-    .regex(/^$|^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD or an empty string to clear"),
-});
+const putSchema = z
+  .object({
+    adminKey: z.string().min(1).max(100),
+    admissionDeadline: z
+      .string()
+      .regex(/^$|^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD or an empty string to clear")
+      .optional(),
+    popupEnabled: z.enum(["on", "off"]).optional(),
+    popupTitle: z.string().trim().max(80).optional(),
+    popupMessage: z.string().trim().max(400).optional(),
+  })
+  .refine(
+    (v) =>
+      v.admissionDeadline !== undefined ||
+      v.popupEnabled !== undefined ||
+      v.popupTitle !== undefined ||
+      v.popupMessage !== undefined,
+    { message: "Nothing to update — provide at least one setting" }
+  );
 
 /** GET — public settings (whitelisted keys only) */
 export async function GET() {
@@ -56,7 +77,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Invalid passcode" }, { status: 401 });
     }
 
-    const { admissionDeadline } = parsed.data;
+    const { admissionDeadline, popupEnabled, popupTitle, popupMessage } = parsed.data;
 
     // Validate the date is a real calendar date (e.g. reject 2026-02-31 —
     // JS Date silently rolls overflow days over, so round-trip the parts)
@@ -72,13 +93,23 @@ export async function PUT(req: NextRequest) {
       }
     }
 
-    await db.setting.upsert({
-      where: { key: "admissionDeadline" },
-      update: { value: admissionDeadline },
-      create: { key: "admissionDeadline", value: admissionDeadline },
-    });
+    const updates: Partial<Record<PublicSettingKey, string>> = {};
+    if (admissionDeadline !== undefined) updates.admissionDeadline = admissionDeadline;
+    if (popupEnabled !== undefined) updates.popupEnabled = popupEnabled;
+    if (popupTitle !== undefined) updates.popupTitle = popupTitle;
+    if (popupMessage !== undefined) updates.popupMessage = popupMessage;
 
-    return NextResponse.json({ ok: true, admissionDeadline });
+    await db.$transaction(
+      Object.entries(updates).map(([key, value]) =>
+        db.setting.upsert({
+          where: { key },
+          update: { value },
+          create: { key, value },
+        })
+      )
+    );
+
+    return NextResponse.json({ ok: true, settings: updates });
   } catch (err) {
     console.error("[settings:PUT]", err);
     return NextResponse.json({ error: "Failed to save settings" }, { status: 500 });

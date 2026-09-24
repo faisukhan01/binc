@@ -25,6 +25,7 @@ import {
   Search,
   Settings2,
   ShieldCheck,
+  Sparkles,
   Star,
   Trash2,
   Users,
@@ -82,6 +83,7 @@ interface AnnouncementItem {
   body: string;
   tag: string;
   pinned: boolean;
+  imageUrl?: string | null;
   createdAt: string;
 }
 
@@ -128,6 +130,121 @@ function firstName(full: string): string {
   return full.trim().split(/\s+/)[0] ?? full;
 }
 
+/** Shared staff image picker — uploads to /api/upload and stores the /uploads/… URL. */
+function ImagePicker({
+  url,
+  onChange,
+  adminKey,
+  label,
+  hint,
+  aspect = "aspect-[16/9]",
+}: {
+  url: string;
+  onChange: (url: string) => void;
+  adminKey: string;
+  label: string;
+  hint?: string;
+  aspect?: string;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [pickerError, setPickerError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const upload = async (file: File) => {
+    setPickerError(null);
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("adminKey", adminKey);
+      fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) {
+        setPickerError(data.error || "Upload failed");
+        return;
+      }
+      onChange(data.url);
+    } catch {
+      setPickerError("Network error — upload failed");
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  };
+
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-xs font-bold">{label}</Label>
+      {url ? (
+        <div className="group relative overflow-hidden rounded-xl border border-border bg-navy-50">
+          <img
+            src={url}
+            alt="Selected preview"
+            className={cn("w-full object-cover", aspect)}
+          />
+          <div className="absolute inset-0 flex items-center justify-center gap-2 bg-navy-950/55 opacity-0 transition-opacity group-hover:opacity-100">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => inputRef.current?.click()}
+              className="border-white/40 bg-white/90 text-xs font-bold text-navy-900 hover:bg-white"
+            >
+              <Pencil className="size-3.5" /> Replace
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => onChange("")}
+              className="border-brand-red/40 bg-white/90 text-xs font-bold text-brand-red hover:bg-brand-red hover:text-white"
+            >
+              <Trash2 className="size-3.5" /> Remove
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading}
+          className="flex min-h-[72px] w-full flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-navy-200 bg-navy-50/50 px-4 py-4 text-center transition-colors hover:border-gold-400/70 hover:bg-gold-400/5 disabled:opacity-60"
+        >
+          {uploading ? (
+            <>
+              <Loader2 className="size-5 animate-spin text-navy-700" />
+              <span className="text-xs font-bold text-navy-800">Uploading…</span>
+            </>
+          ) : (
+            <>
+              <span className="grid size-8 place-items-center rounded-full bg-white shadow-sm ring-1 ring-navy-100">
+                <Plus className="size-4 text-brand-red" />
+              </span>
+              <span className="text-xs font-extrabold text-navy-900">Upload an image</span>
+              <span className="text-[11px] text-muted-foreground">JPG · PNG · WEBP · GIF — up to 3 MB</span>
+            </>
+          )}
+        </button>
+      )}
+      {hint && !url && <p className="text-[11px] text-muted-foreground">{hint}</p>}
+      {pickerError && (
+        <p className="rounded-lg bg-brand-red/10 px-3 py-2 text-xs font-bold text-brand-red">{pickerError}</p>
+      )}
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        className="sr-only"
+        aria-label="Choose image file"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) void upload(f);
+        }}
+      />
+    </div>
+  );
+}
+
 export function AdminConsole() {
   const [open, setOpen] = useState(false);
   const [adminKey, setAdminKey] = useState("");
@@ -144,12 +261,18 @@ export function AdminConsole() {
     "applications" | "announcements" | "testimonials" | "settings"
   >("applications");
 
-  /** Public site settings for the Settings tab (deadline countdown) */
+  /** Public site settings for the Settings tab (deadline + popup behaviour) */
   const loadSettings = useCallback(async () => {
     try {
       const res = await fetch("/api/settings");
       const data = await res.json();
-      if (res.ok) setDeadline(data.settings?.admissionDeadline ?? "");
+      if (res.ok) {
+        const s = data.settings ?? {};
+        setDeadline(s.admissionDeadline ?? "");
+        setPopupEnabled(s.popupEnabled === "off" ? "off" : "on");
+        setPopupTitle(s.popupTitle ?? "");
+        setPopupMessage(s.popupMessage ?? "");
+      }
     } catch {
       /* non-critical */
     }
@@ -163,6 +286,7 @@ export function AdminConsole() {
   const [annSaving, setAnnSaving] = useState(false);
   const [annError, setAnnError] = useState<string | null>(null);
   const [annEditingId, setAnnEditingId] = useState<string | null>(null);
+  const [annImage, setAnnImage] = useState("");
   const [testimonials, setTestimonials] = useState<TestimonialItem[]>([]);
   const [tstLoading, setTstLoading] = useState(false);
   const [tstName, setTstName] = useState("");
@@ -184,6 +308,11 @@ export function AdminConsole() {
   const [deadline, setDeadline] = useState("");
   const [deadlineSaving, setDeadlineSaving] = useState(false);
   const [deadlineMsg, setDeadlineMsg] = useState<string | null>(null);
+  const [popupEnabled, setPopupEnabled] = useState<"on" | "off">("on");
+  const [popupTitle, setPopupTitle] = useState("");
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupSaving, setPopupSaving] = useState(false);
+  const [popupMsg, setPopupMsg] = useState<string | null>(null);
   const prevTotalRef = useRef<number | null>(null);
 
   // Open via footer event
@@ -336,7 +465,7 @@ export function AdminConsole() {
           setDeadlineMsg(data.error || "Could not save the deadline");
           return;
         }
-        setDeadline(data.admissionDeadline ?? value);
+        setDeadline(data.settings?.admissionDeadline ?? value);
         setDeadlineMsg("✓ Saved — the website countdown updates instantly.");
       } catch {
         setDeadlineMsg("Network error — please try again");
@@ -346,6 +475,40 @@ export function AdminConsole() {
     },
     [adminKey]
   );
+
+  /** Save the popup behaviour settings (enabled / title / message) */
+  const savePopup = useCallback(async () => {
+    setPopupSaving(true);
+    setPopupMsg(null);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          adminKey,
+          popupEnabled,
+          popupTitle: popupTitle.trim(),
+          popupMessage: popupMessage.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPopupMsg(data.error || "Could not save popup settings");
+        return;
+      }
+      setPopupMsg(
+        popupEnabled === "off"
+          ? "✓ Saved — the popup is now hidden for all visitors."
+          : popupTitle.trim() || popupMessage.trim()
+            ? "✓ Saved — visitors see your custom popup text."
+            : "✓ Saved — the popup shows the default Fall 26 message."
+      );
+    } catch {
+      setPopupMsg("Network error — please try again");
+    } finally {
+      setPopupSaving(false);
+    }
+  }, [adminKey, popupEnabled, popupTitle, popupMessage]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -423,6 +586,10 @@ export function AdminConsole() {
     setDeadline("");
     setDeadlineMsg(null);
     setLiveAt(null);
+    setPopupEnabled("on");
+    setPopupTitle("");
+    setPopupMessage("");
+    setPopupMsg(null);
     prevTotalRef.current = null;
   };
 
@@ -458,6 +625,7 @@ export function AdminConsole() {
     setAnnBody("");
     setAnnTag("Notice");
     setAnnPinned(false);
+    setAnnImage("");
     setAnnEditingId(null);
   }, []);
 
@@ -467,6 +635,7 @@ export function AdminConsole() {
     setAnnBody(a.body);
     setAnnTag(a.tag);
     setAnnPinned(a.pinned);
+    setAnnImage(a.imageUrl ?? "");
     setAnnError(null);
   }, []);
 
@@ -485,6 +654,7 @@ export function AdminConsole() {
           body: annBody,
           tag: annTag,
           pinned: annPinned,
+          imageUrl: annImage.trim(),
         }),
       });
       const data = await res.json();
@@ -509,7 +679,7 @@ export function AdminConsole() {
     } finally {
       setAnnSaving(false);
     }
-  }, [adminKey, annTitle, annBody, annTag, annPinned, annEditingId, resetAnnForm, notifySite]);
+  }, [adminKey, annTitle, annBody, annTag, annPinned, annImage, annEditingId, resetAnnForm, notifySite]);
 
   const deleteAnnouncement = useCallback(
     async (id: string) => {
@@ -1223,6 +1393,13 @@ export function AdminConsole() {
                         className="rounded-xl text-sm"
                       />
                     </div>
+                    <ImagePicker
+                      label="Image (optional)"
+                      hint="Shown as a photo banner on the notice-board card — event posters, result sheets, campus snapshots."
+                      url={annImage}
+                      onChange={setAnnImage}
+                      adminKey={adminKey}
+                    />
                     <div className="flex flex-wrap items-center gap-3">
                       <div className="space-y-1.5">
                         <Label className="text-xs font-bold">Tag</Label>
@@ -1310,6 +1487,14 @@ export function AdminConsole() {
                           >
                             <div className="min-w-0">
                               <div className="flex flex-wrap items-center gap-2">
+                                {a.imageUrl && (
+                                  <img
+                                    src={a.imageUrl}
+                                    alt=""
+                                    aria-hidden
+                                    className="size-10 shrink-0 rounded-lg border border-border object-cover"
+                                  />
+                                )}
                                 <span className="rounded-full bg-navy-50 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-navy-800 ring-1 ring-navy-100">
                                   {a.tag}
                                 </span>
@@ -1494,11 +1679,24 @@ export function AdminConsole() {
                     </div>
                     <div className="space-y-1.5">
                       <Label htmlFor="tst-photo" className="text-xs font-bold">
-                        Photo URL{" "}
+                        Student photo{" "}
                         <span className="font-medium text-muted-foreground">
                           (optional — an initials avatar is used if empty)
                         </span>
                       </Label>
+                      <ImagePicker
+                        label="Upload photo"
+                        hint="A square-ish portrait works best — it is shown as a ringed avatar on the website."
+                        url={tstPhoto}
+                        onChange={setTstPhoto}
+                        adminKey={adminKey}
+                        aspect="aspect-square max-w-[140px]"
+                      />
+                      <div className="flex items-center gap-2 pt-1">
+                        <span className="h-px flex-1 bg-border" />
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">or paste a link</span>
+                        <span className="h-px flex-1 bg-border" />
+                      </div>
                       <Input
                         id="tst-photo"
                         value={tstPhoto}
@@ -1666,6 +1864,130 @@ export function AdminConsole() {
                       ? `Countdown is live — applications close ${new Date(`${deadline}T12:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}.`
                       : "No deadline set — the countdown is currently hidden on the website."}
                   </p>
+                </div>
+
+                {/* POPUP BEHAVIOUR */}
+                <div className="mt-4 rounded-xl border border-border bg-navy-50/50 p-4">
+                  <p className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.2em] text-navy-800">
+                    <Sparkles className="size-4 text-gold-600" /> Admission popup (Fall 26)
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    The animated “Admissions Open” popup that appears when someone opens the
+                    website. Turn it off for the season, or override its headline and message —
+                    changes apply to new visitors instantly, no redeploy needed.
+                  </p>
+                  <div className="mt-4 grid gap-3">
+                    <div className="grid items-end gap-3 sm:grid-cols-[160px_1fr]">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-bold">Popup status</Label>
+                        <Select value={popupEnabled} onValueChange={(v) => setPopupEnabled(v === "off" ? "off" : "on")}>
+                          <SelectTrigger className="h-10 rounded-xl text-sm font-bold" aria-label="Popup status">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="on" className="text-sm font-bold">On — show to visitors</SelectItem>
+                            <SelectItem value="off" className="text-sm font-bold">Off — hidden</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div
+                        className={cn(
+                          "flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-xs font-bold",
+                          popupEnabled === "on"
+                            ? "bg-welfare-500/10 text-welfare-700"
+                            : "bg-brand-red/10 text-brand-red"
+                        )}
+                      >
+                        <span className={`relative flex size-2 ${popupEnabled === "on" ? "" : "opacity-60"}`}>
+                          {popupEnabled === "on" && (
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-welfare-500 opacity-75" />
+                          )}
+                          <span className={`relative inline-flex size-2 rounded-full ${popupEnabled === "on" ? "bg-welfare-500" : "bg-brand-red"}`} />
+                        </span>
+                        {popupEnabled === "on"
+                          ? "Live — the popup appears ~1.6s after a visitor opens the site (once per session)."
+                          : "Paused — new visitors will not see the popup until you switch it back on."}
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="set-popup-title" className="text-xs font-bold">
+                        Custom headline{" "}
+                        <span className="font-medium text-muted-foreground">(optional — gold line under “Admissions”)</span>
+                      </Label>
+                      <Input
+                        id="set-popup-title"
+                        value={popupTitle}
+                        onChange={(e) => {
+                          setPopupTitle(e.target.value);
+                          setPopupMsg(null);
+                        }}
+                        maxLength={80}
+                        placeholder="e.g. OPEN — Fall 26 · Scholarships available"
+                        className="rounded-xl text-sm"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="set-popup-message" className="text-xs font-bold">
+                        Custom message{" "}
+                        <span className="font-medium text-muted-foreground">(optional — body text of the popup)</span>
+                      </Label>
+                      <Textarea
+                        id="set-popup-message"
+                        value={popupMessage}
+                        onChange={(e) => {
+                          setPopupMessage(e.target.value);
+                          setPopupMsg(null);
+                        }}
+                        rows={3}
+                        maxLength={400}
+                        placeholder="e.g. Last week to apply! Walk-in interviews every Saturday at the Township campus…"
+                        className="rounded-xl text-sm"
+                      />
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      <Button
+                        onClick={() => void savePopup()}
+                        disabled={popupSaving}
+                        className="min-h-[40px] rounded-xl bg-gradient-to-r from-navy-900 to-navy-800 px-5 text-sm font-extrabold text-white shadow-lg hover:shadow-xl disabled:opacity-60"
+                      >
+                        {popupSaving ? (
+                          <>
+                            <Loader2 className="size-4 animate-spin" /> Saving…
+                          </>
+                        ) : (
+                          <>
+                            <Check className="size-4" /> Save popup settings
+                          </>
+                        )}
+                      </Button>
+                      {(popupTitle || popupMessage) && (
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setPopupTitle("");
+                            setPopupMessage("");
+                            setPopupMsg(null);
+                          }}
+                          disabled={popupSaving}
+                          className="min-h-[40px] rounded-xl border-brand-red/25 px-4 text-sm font-bold text-brand-red hover:bg-brand-red hover:text-white"
+                        >
+                          <X className="size-4" /> Reset custom text
+                        </Button>
+                      )}
+                    </div>
+                    {popupMsg && (
+                      <p
+                        className={cn(
+                          "rounded-lg px-3 py-2 text-xs font-bold",
+                          popupMsg.startsWith("✓")
+                            ? "bg-welfare-500/10 text-welfare-700"
+                            : "bg-brand-red/10 text-brand-red"
+                        )}
+                      >
+                        {popupMsg}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 <p className="mt-3 text-center text-[11px] text-muted-foreground">
                   More site settings will appear here as the console grows.
