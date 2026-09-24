@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowDown, Download, GraduationCap, ShieldCheck, Users } from "lucide-react";
 import { SITE } from "@/lib/site-data";
+import { useT } from "@/lib/lang";
+import { UR } from "@/lib/i18n";
 
 const HEADLINE = ["Build", "a", "Brighter", "Future."];
 
@@ -17,6 +19,9 @@ export function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
+  const { isUr } = useT();
+  const headline = isUr ? [...UR.hero.headline] : HEADLINE;
+  const statLabels = isUr ? UR.hero.stats : STATS.map((s) => s.label);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
@@ -92,7 +97,7 @@ export function Hero() {
                 Fall 2026
               </span>
               <span className="text-xs sm:text-sm font-semibold text-white/90 tracking-wide">
-                Admissions Open — Limited Seats
+                {isUr ? UR.hero.pill : "Admissions Open — Limited Seats"}
               </span>
               <span className="relative flex size-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-redlight opacity-80" />
@@ -101,12 +106,14 @@ export function Hero() {
             </motion.div>
 
             {/* Headline */}
-            <h1 className="font-display text-white font-black leading-[1.02] text-[13.5vw] sm:text-6xl md:text-7xl lg:text-[5.4rem] tracking-tight">
-              {HEADLINE.map((word, i) => (
-                <span key={word} className="inline-block overflow-hidden pb-1 align-bottom">
+            <h1
+              className={`font-display text-white font-black ${isUr ? "text-[11.5vw] leading-[1.6] sm:text-6xl md:text-7xl lg:text-[5rem]" : "text-[13.5vw] leading-[1.02] sm:text-6xl md:text-7xl lg:text-[5.4rem] tracking-tight"}`}
+            >
+              {headline.map((word, i) => (
+                <span key={word} className={`inline-block overflow-hidden align-bottom ${isUr ? "pb-4" : "pb-1"}`}>
                   <motion.span
                     className={`inline-block ${
-                      word === "Brighter" ? "text-gradient-gold pr-2" : ""
+                      (isUr ? i < UR.hero.goldWordCount : word === "Brighter") ? "text-gradient-gold pr-2" : ""
                     }`}
                     initial={{ y: "110%", rotate: 4 }}
                     animate={{ y: 0, rotate: 0 }}
@@ -117,7 +124,7 @@ export function Hero() {
                     }}
                   >
                     {word}
-                    {i < HEADLINE.length - 1 ? "\u00A0" : ""}
+                    {i < headline.length - 1 ? "\u00A0" : ""}
                   </motion.span>
                 </span>
               ))}
@@ -129,12 +136,21 @@ export function Hero() {
               transition={{ delay: 0.9, duration: 0.7 }}
               className="mt-5 sm:mt-6 max-w-xl text-base sm:text-lg lg:text-xl leading-relaxed text-navy-100/95"
             >
-              Choose a professional degree at{" "}
-              <span className="font-semibold text-white">
-                Bright International College
-              </span>{" "}
-              — Pharm-D, Doctor of Physical Therapy and BS Computer Science — with
-              expert faculty, modern labs and a campus that feels like family.
+              {isUr ? (
+                <>
+                  <span className="font-semibold text-white">{UR.hero.subStrong}</span>
+                  {UR.hero.subAfter}
+                </>
+              ) : (
+                <>
+                  Choose a professional degree at{" "}
+                  <span className="font-semibold text-white">
+                    Bright International College
+                  </span>{" "}
+                  — Pharm-D, Doctor of Physical Therapy and BS Computer Science — with
+                  expert faculty, modern labs and a campus that feels like family.
+                </>
+              )}
             </motion.p>
 
             {/* CTAs */}
@@ -148,8 +164,8 @@ export function Hero() {
                 href="#apply"
                 className="group inline-flex min-h-[52px] items-center gap-2.5 rounded-2xl bg-gradient-to-r from-brand-red to-brand-redlight px-7 py-3.5 text-base font-bold text-white shadow-xl shadow-brand-red/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-brand-red/50 active:translate-y-0"
               >
-                Apply Online Now
-                <span className="grid size-6 place-items-center rounded-full bg-white/20 transition-transform duration-300 group-hover:translate-x-1">
+                {isUr ? UR.hero.apply : "Apply Online Now"}
+                <span className="grid size-6 place-items-center rounded-full bg-white/20 transition-transform duration-300 group-hover:translate-x-1 rtl-mirror">
                   →
                 </span>
               </a>
@@ -157,17 +173,17 @@ export function Hero() {
                 href="#programs"
                 className="inline-flex min-h-[52px] items-center gap-2 rounded-2xl border border-white/25 bg-white/10 px-7 py-3.5 text-base font-bold text-white backdrop-blur-md transition-all duration-300 hover:bg-white hover:text-navy-900"
               >
-                Explore Programs
+                {isUr ? UR.hero.explore : "Explore Programs"}
               </a>
               <a
                 href="/prospectus/binc-prospectus-2026.pdf"
                 target="_blank"
                 rel="noreferrer"
-                aria-label="Download the official BINC prospectus PDF for Fall 2026"
+                aria-label={isUr ? UR.hero.prospectusAria : "Download the official BINC prospectus PDF for Fall 2026"}
                 className="group inline-flex min-h-[52px] items-center gap-2 rounded-2xl border border-gold-400/40 bg-gold-400/10 px-5 py-3.5 text-sm font-bold text-gold-300 backdrop-blur-md transition-all duration-300 hover:bg-gold-400 hover:text-navy-950"
               >
                 <Download className="size-4.5 transition-transform duration-300 group-hover:translate-y-0.5" />
-                Prospectus 2026
+                {isUr ? UR.hero.prospectus : "Prospectus 2026"}
               </a>
               <a
                 href={`https://wa.me/${SITE.whatsappIntl}`}
@@ -191,14 +207,14 @@ export function Hero() {
               transition={{ delay: 1.25, duration: 0.8 }}
               className="mt-10 sm:mt-14 grid max-w-xl grid-cols-3 divide-x divide-white/15 rounded-2xl glass-dark border border-white/12"
             >
-              {STATS.map((s) => (
+              {STATS.map((s, i) => (
                 <div key={s.label} className="flex flex-col items-center gap-1.5 px-2 py-4 sm:py-5 text-center">
                   <s.icon className="size-4 sm:size-5 text-gold-400" aria-hidden />
                   <dd className="font-display text-xl sm:text-3xl font-extrabold text-white leading-none">
                     {s.value}
                   </dd>
                   <dt className="text-[10px] sm:text-xs font-medium text-navy-100/80 leading-tight">
-                    {s.label}
+                    {statLabels[i]}
                   </dt>
                 </div>
               ))}
@@ -216,7 +232,7 @@ export function Hero() {
         transition={{ delay: 1.8 }}
         className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/70 hover:text-white transition-colors"
       >
-        <span className="text-[10px] font-bold uppercase tracking-[0.3em]">Scroll</span>
+        <span className="text-[10px] font-bold uppercase tracking-[0.3em]">{isUr ? UR.hero.scroll : "Scroll"}</span>
         <span className="flex h-10 w-6 items-start justify-center rounded-full border-2 border-white/40 p-1.5">
           <span className="size-1.5 rounded-full bg-white animate-scroll-dot" />
         </span>

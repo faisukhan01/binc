@@ -5,11 +5,14 @@ import { useCallback, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
 import { GALLERY } from "@/lib/site-data";
+import { useT } from "@/lib/lang";
+import { UR } from "@/lib/i18n";
 import { Reveal, SectionHeading } from "./Reveal";
 
 export function Gallery() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const open = openIndex !== null;
+  const { isUr } = useT();
 
   const step = useCallback(
     (dir: 1 | -1) => {
@@ -34,13 +37,23 @@ export function Gallery() {
     <section id="gallery" className="relative bg-white py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <SectionHeading
-          kicker="Campus Gallery"
+          kicker={isUr ? UR.gallery.kicker : "Campus Gallery"}
           title={
-            <>
-              Life at <span className="text-gradient-navy-red">Bright</span>
-            </>
+            isUr ? (
+              <>
+                {UR.gallery.titleA} <span className="text-gradient-navy-red">{UR.gallery.titleB}</span>
+              </>
+            ) : (
+              <>
+                Life at <span className="text-gradient-navy-red">Bright</span>
+              </>
+            )
           }
-          subtitle="Labs, library, campus and celebrations — take a look around before you visit us."
+          subtitle={
+            isUr
+              ? UR.gallery.subtitle
+              : "Labs, library, campus and celebrations — take a look around before you visit us."
+          }
         />
 
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
@@ -77,11 +90,13 @@ export function Gallery() {
                 {/* gradient + caption overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-navy-950/85 via-navy-950/10 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-100" />
                 <span className="absolute left-3 top-3 rounded-full bg-navy-950/60 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-gold-400 backdrop-blur-sm">
-                  {g.tag}
+                  {isUr && g.tag in UR.gallery.tags
+                    ? UR.gallery.tags[g.tag as keyof typeof UR.gallery.tags]
+                    : g.tag}
                 </span>
-                <span className="absolute inset-x-3 bottom-3 flex items-end justify-between gap-2 text-left">
+                <span className="absolute inset-x-3 bottom-3 flex items-end justify-between gap-2 text-start">
                   <span className="text-xs font-bold leading-snug text-white sm:text-sm">
-                    {g.caption}
+                    {isUr ? UR.gallery.captions[i] ?? g.caption : g.caption}
                   </span>
                   <motion.span
                     variants={{ rest: { opacity: 0, y: 6 }, hover: { opacity: 1, y: 0 } }}
@@ -154,10 +169,12 @@ export function Gallery() {
               </div>
               <figcaption className="mt-4 flex flex-col items-center gap-1 text-center">
                 <p className="font-display text-lg font-extrabold text-white">
-                  {GALLERY[openIndex].caption}
+                  {isUr ? UR.gallery.captions[openIndex] ?? GALLERY[openIndex].caption : GALLERY[openIndex].caption}
                 </p>
                 <p className="text-xs font-bold uppercase tracking-[0.25em] text-gold-400">
-                  {openIndex + 1} / {GALLERY.length} · {GALLERY[openIndex].tag}
+                  {openIndex + 1} / {GALLERY.length} · {isUr && GALLERY[openIndex].tag in UR.gallery.tags
+                    ? UR.gallery.tags[GALLERY[openIndex].tag as keyof typeof UR.gallery.tags]
+                    : GALLERY[openIndex].tag}
                 </p>
               </figcaption>
             </motion.figure>

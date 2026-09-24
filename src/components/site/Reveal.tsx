@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
-
 interface RevealProps {
   children: ReactNode;
   delay?: number;
@@ -44,7 +43,7 @@ export function SectionHeading({
   return (
     <Reveal
       className={`mb-12 sm:mb-16 ${
-        align === "center" ? "text-center mx-auto" : "text-left"
+        align === "center" ? "text-center mx-auto" : "text-start"
       } max-w-2xl`}
     >
       <p

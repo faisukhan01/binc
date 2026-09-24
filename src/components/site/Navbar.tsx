@@ -5,6 +5,9 @@ import Image from "next/image";
 import { Menu, Phone, X, Sparkles } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { SITE, NAV_LINKS } from "@/lib/site-data";
+import { useT } from "@/lib/lang";
+import { UR } from "@/lib/i18n";
+import { LangToggle } from "./LangToggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +15,8 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<string>("#home");
+  const { isUr } = useT();
+  const links = isUr ? UR.nav.links : NAV_LINKS;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -65,7 +70,7 @@ export function Navbar() {
               <span className="relative inline-flex size-2 rounded-full bg-gold-400" />
             </span>
             <span className="truncate font-medium tracking-wide">
-              ADMISSIONS OPEN — FALL 2026 · Limited Seats
+              {isUr ? UR.topbar : "ADMISSIONS OPEN — FALL 2026 · Limited Seats"}
             </span>
           </p>
           <div className="hidden md:flex items-center gap-5 shrink-0">
@@ -117,14 +122,14 @@ export function Navbar() {
                   BRIGHT <span className="text-brand-red">INTERNATIONAL</span> COLLEGE
                 </span>
                 <span className="block text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.22em] text-gold-600">
-                  Excellence in Education
+                  {isUr ? SITE.taglineUr : "Excellence in Education"}
                 </span>
               </span>
             </a>
 
             {/* Desktop links */}
             <div className="hidden lg:flex items-center gap-0.5 xl:gap-1">
-              {NAV_LINKS.map((l) => (
+              {links.map((l) => (
                 <a
                   key={l.href}
                   href={l.href}
@@ -151,17 +156,18 @@ export function Navbar() {
             </div>
 
             <div className="flex items-center gap-2.5">
+              <LangToggle />
               <a
                 href="#apply"
                 className="hidden sm:inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-red to-brand-redlight px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-red/30 hover:shadow-brand-red/50 hover:-translate-y-0.5 transition-all duration-300 min-h-[44px]"
               >
                 <Sparkles className="size-4" />
-                Apply Now
+                {isUr ? UR.nav.applyNow : "Apply Now"}
               </a>
               <Button
                 variant="outline"
                 size="icon"
-                aria-label="Open menu"
+                aria-label={isUr ? UR.nav.menuOpen : "Open menu"}
                 onClick={() => setOpen(true)}
                 className="lg:hidden size-11 border-navy-850/20 text-navy-850 hover:bg-navy-50"
               >
@@ -219,7 +225,7 @@ export function Navbar() {
               </div>
 
               <nav className="flex-1 overflow-y-auto p-4 flex flex-col gap-1">
-                {NAV_LINKS.map((l, i) => (
+                {links.map((l, i) => (
                   <motion.a
                     key={l.href}
                     href={l.href}
@@ -252,7 +258,7 @@ export function Navbar() {
                   onClick={() => setOpen(false)}
                   className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-red to-brand-redlight px-5 py-3.5 text-base font-bold text-white min-h-[48px]"
                 >
-                  <Sparkles className="size-5" /> Apply Now — Fall 2026
+                  <Sparkles className="size-5" /> {isUr ? UR.nav.drawerApply : "Apply Now — Fall 2026"}
                 </a>
                 <a
                   href={`https://wa.me/${SITE.whatsappIntl}`}

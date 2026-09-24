@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit, Playfair_Display } from "next/font/google";
+import { Outfit, Playfair_Display, Noto_Naskh_Arabic, Noto_Nastaliq_Urdu } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { LangBoot } from "@/components/site/LangBoot";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -12,6 +13,18 @@ const outfit = Outfit({
 const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const notoNaskh = Noto_Naskh_Arabic({
+  variable: "--font-naskh",
+  subsets: ["arabic"],
+  display: "swap",
+});
+
+const notoNastaliq = Noto_Nastaliq_Urdu({
+  variable: "--font-nastaliq",
+  subsets: ["arabic"],
   display: "swap",
 });
 
@@ -71,11 +84,19 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      dir="ltr"
       suppressHydrationWarning
-      className={`${outfit.variable} ${playfair.variable}`}
+      className={`${outfit.variable} ${playfair.variable} ${notoNaskh.variable} ${notoNastaliq.variable}`}
     >
       <body className="antialiased bg-background text-foreground font-sans">
+        <a
+          href="#home"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-navy-950 focus:px-4 focus:py-2.5 focus:text-sm focus:font-bold focus:text-white focus:shadow-2xl"
+        >
+          Skip to content
+        </a>
         {children}
+        <LangBoot />
         <Toaster />
       </body>
     </html>

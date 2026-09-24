@@ -257,3 +257,40 @@ section[id] {
     display: none !important;
   }
 }
+
+/* ==================== Urdu / RTL support ==================== */
+/* Body text: Noto Naskh Arabic (readable at small sizes) */
+html[dir="rtl"] body {
+  font-family: var(--font-naskh), var(--font-outfit), ui-sans-serif, sans-serif;
+}
+/* Headings: Noto Nastaliq Urdu (calligraphic) — needs generous line-height */
+html[dir="rtl"] .font-display {
+  font-family: var(--font-nastaliq), var(--font-playfair), serif;
+  line-height: 1.9;
+  letter-spacing: normal;
+}
+html[dir="rtl"] h1, html[dir="rtl"] h2, html[dir="rtl"] h3 {
+  line-height: 1.85;
+}
+/* Latin brand words (BINC, Pharm-D…) keep a latin face inside Urdu text */
+html[dir="rtl"] .font-mono {
+  font-family: var(--font-outfit), monospace;
+}
+/* Wide tracking classes ruin Nastaliq/Naskh rhythm — neutralize in RTL */
+html[dir="rtl"] [class*="tracking-"] {
+  letter-spacing: normal !important;
+}
+/* Italic quotes make no sense in Nastaliq */
+html[dir="rtl"] em, html[dir="rtl"] .italic {
+  font-style: normal;
+}
+/* Forward arrows point left in RTL — mirror inline arrow glyphs */
+html[dir="rtl"] .rtl-mirror {
+  display: inline-block;
+  transform: scaleX(-1);
+}
+/* Countdown digits + phone numbers stay LTR inside RTL paragraphs */
+html[dir="rtl"] .rtl-ltr {
+  direction: ltr;
+  unicode-bidi: embed;
+}

@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import { CheckCircle2, HandHeart, PhoneCall, Sparkles } from "lucide-react";
 import { SITE } from "@/lib/site-data";
+import { useT } from "@/lib/lang";
+import { UR } from "@/lib/i18n";
 import { Reveal, SectionHeading } from "./Reveal";
 
 const SUPPORT_ITEMS = [
@@ -13,6 +15,8 @@ const SUPPORT_ITEMS = [
 ];
 
 export function Welfare() {
+  const { isUr } = useT();
+  const items = isUr ? UR.welfare.items : SUPPORT_ITEMS;
   return (
     <section id="welfare" className="relative overflow-hidden py-20 sm:py-28">
       {/* Green gradient background */}
@@ -30,14 +34,24 @@ export function Welfare() {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
         <SectionHeading
           dark
-          kicker="Social Welfare Workers"
+          kicker={isUr ? UR.welfare.kicker : "Social Welfare Workers"}
           title={
-            <>
-              Education support that{" "}
-              <span className="text-gradient-gold">changes lives</span>
-            </>
+            isUr ? (
+              <>
+                {UR.welfare.titleA} <span className="text-gradient-gold">{UR.welfare.titleB}</span>
+              </>
+            ) : (
+              <>
+                Education support that{" "}
+                <span className="text-gradient-gold">changes lives</span>
+              </>
+            )
           }
-          subtitle="Special admission support for eligible welfare workers and their families — because talent deserves opportunity."
+          subtitle={
+            isUr
+              ? UR.welfare.subtitle
+              : "Special admission support for eligible welfare workers and their families — because talent deserves opportunity."
+          }
         />
 
         <div className="grid gap-7 lg:grid-cols-[1.15fr_0.85fr]">
@@ -53,16 +67,25 @@ export function Welfare() {
                   <HandHeart className="size-7 text-navy-950" />
                 </motion.span>
                 <h3 className="font-display text-2xl sm:text-3xl font-black text-white">
-                  Education Support Program
+                  {isUr ? UR.welfare.cardTitle : "Education Support Program"}
                 </h3>
               </div>
               <p className="mt-5 text-base leading-relaxed text-white/85">
-                Registered welfare workers (PWWF) and eligible applicants can study{" "}
-                <strong className="text-gold-300">completely free of admission charges</strong>.
-                Our admissions office verifies eligibility and walks you through every step.
+                {isUr ? (
+                  <>
+                    {UR.welfare.cardBodyA} <strong className="text-gold-300">{UR.welfare.cardBodyStrong}</strong>
+                    {UR.welfare.cardBodyB}
+                  </>
+                ) : (
+                  <>
+                    Registered welfare workers (PWWF) and eligible applicants can study{" "}
+                    <strong className="text-gold-300">completely free of admission charges</strong>.
+                    Our admissions office verifies eligibility and walks you through every step.
+                  </>
+                )}
               </p>
               <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-                {SUPPORT_ITEMS.map((item, i) => (
+                {items.map((item, i) => (
                   <motion.li
                     key={item}
                     initial={{ opacity: 0, x: -18 }}
@@ -84,7 +107,7 @@ export function Welfare() {
             <div className="relative h-full overflow-hidden rounded-3xl bg-white p-6 shadow-2xl sm:p-8">
               <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-welfare-500 via-gold-400 to-welfare-500" />
               <p className="text-center text-[11px] font-extrabold uppercase tracking-[0.3em] text-welfare-700">
-                Special Welfare Offer
+                {isUr ? UR.welfare.offerKicker : "Special Welfare Offer"}
               </p>
               <motion.p
                 initial={{ scale: 0.9, opacity: 0 }}
@@ -95,17 +118,16 @@ export function Welfare() {
               >
                 100%
                 <span className="block text-3xl sm:text-4xl mt-1 text-brand-red">
-                  ADMISSION FREE
+                  {isUr ? UR.welfare.admissionFree : "ADMISSION FREE"}
                 </span>
               </motion.p>
               <p className="mt-4 text-center text-sm leading-relaxed text-muted-foreground">
-                For eligible welfare workers. Contact admissions for eligibility
-                check and verification.
+                {isUr ? UR.welfare.offerBody : "For eligible welfare workers. Contact admissions for eligibility check and verification."}
               </p>
 
               <div className="mt-5 rounded-2xl bg-navy-950 p-4 text-center">
                 <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-navy-100/70">
-                  Welfare Helpline
+                  {isUr ? UR.welfare.helpline : "Welfare Helpline"}
                 </p>
                 <a
                   href={`https://wa.me/${SITE.whatsappIntl}`}
@@ -123,7 +145,7 @@ export function Welfare() {
                 className="mt-4 flex min-h-[50px] items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-welfare-500 to-welfare-700 px-6 py-3.5 text-base font-extrabold text-white shadow-lg shadow-welfare-500/30 transition-all hover:-translate-y-0.5 hover:shadow-xl"
               >
                 <Sparkles className="size-5" />
-                Check My Eligibility
+                {isUr ? UR.welfare.checkEligibility : "Check My Eligibility"}
               </a>
             </div>
           </Reveal>

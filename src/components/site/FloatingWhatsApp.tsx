@@ -4,10 +4,13 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUp, X } from "lucide-react";
 import { SITE } from "@/lib/site-data";
+import { useT } from "@/lib/lang";
+import { UR } from "@/lib/i18n";
 
 export function FloatingWhatsApp() {
   const [showTop, setShowTop] = useState(false);
   const [banner, setBanner] = useState(false);
+  const { isUr } = useT();
 
   useEffect(() => {
     const onScroll = () => setShowTop(window.scrollY > 700);
@@ -39,9 +42,9 @@ export function FloatingWhatsApp() {
             >
               <X className="size-3.5" />
             </button>
-            <p className="text-xs font-bold text-navy-950">Need admission info? 👋</p>
+            <p className="text-xs font-bold text-navy-950">{isUr ? UR.floating.bubbleTitle : "Need admission info? 👋"}</p>
             <p className="mt-0.5 text-[11px] text-muted-foreground">
-              Chat with us on WhatsApp — instant replies!
+              {isUr ? UR.floating.bubbleBody : "Chat with us on WhatsApp — instant replies!"}
             </p>
           </motion.div>
         )}

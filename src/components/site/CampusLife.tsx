@@ -3,24 +3,38 @@
 import { useRef } from "react";
 import { motion } from "framer-motion";
 import { Play } from "lucide-react";
+import { useT } from "@/lib/lang";
+import { UR } from "@/lib/i18n";
 import { Reveal, SectionHeading } from "./Reveal";
 
 const HIGHLIGHTS = ["Modern Campus", "Student Societies", "Seminars & Events", "Safe Environment"];
 
 export function CampusLife() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { isUr } = useT();
+  const highlights = isUr ? UR.campus.highlights : HIGHLIGHTS;
 
   return (
     <section id="campus" className="relative overflow-hidden bg-navy-950 py-20 sm:py-28">
       <SectionHeading
         dark
-        kicker="Campus Life"
+        kicker={isUr ? UR.campus.kicker : "Campus Life"}
         title={
-          <>
-            Life at <span className="text-gradient-gold">Bright</span>
-          </>
+          isUr ? (
+            <>
+              {UR.campus.titleA} <span className="text-gradient-gold">{UR.campus.titleB}</span>
+            </>
+          ) : (
+            <>
+              Life at <span className="text-gradient-gold">Bright</span>
+            </>
+          )
         }
-        subtitle="A welcoming campus in the heart of Lahore where learning extends beyond classrooms."
+        subtitle={
+          isUr
+            ? UR.campus.subtitle
+            : "A welcoming campus in the heart of Lahore where learning extends beyond classrooms."
+        }
       />
 
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -62,14 +76,14 @@ export function CampusLife() {
                     57 Sector A, GECHS Township — Lahore
                   </h3>
                   <p className="mt-1 text-sm text-navy-100/85">
-                    Near Pindi Stop · easily accessible from across the city
+                    {isUr ? UR.campus.addressNote : "Near Pindi Stop · easily accessible from across the city"}
                   </p>
                 </div>
                 <a
                   href="#contact"
                   className="inline-flex w-fit min-h-[46px] items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-extrabold text-navy-950 shadow-lg transition-transform hover:-translate-y-0.5"
                 >
-                  Visit Campus
+                  {isUr ? UR.campus.visit : "Visit Campus"}
                 </a>
               </div>
             </div>
@@ -78,7 +92,7 @@ export function CampusLife() {
 
         {/* Highlights */}
         <div className="mt-8 grid grid-cols-2 gap-3.5 sm:grid-cols-4">
-          {HIGHLIGHTS.map((h, i) => (
+          {highlights.map((h, i) => (
             <Reveal key={h} delay={0.08 * i}>
               <div className="flex items-center justify-center gap-2.5 rounded-2xl border border-white/12 bg-white/6 px-4 py-4 text-center text-sm font-bold text-white backdrop-blur-sm transition-colors hover:bg-white/12">
                 <span className="size-2 shrink-0 rounded-full bg-gold-400" />

@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import { ClipboardEdit, FileCheck, GraduationCap, PhoneCall } from "lucide-react";
 import { ADMISSION_STEPS } from "@/lib/site-data";
+import { useT } from "@/lib/lang";
+import { UR } from "@/lib/i18n";
 import { Reveal, SectionHeading } from "./Reveal";
 
 const ICONS = {
@@ -13,17 +15,31 @@ const ICONS = {
 } as const;
 
 export function Process() {
+  const { isUr } = useT();
+  const steps = isUr
+    ? ADMISSION_STEPS.map((s, i) => ({ ...s, title: UR.process.steps[i].title, desc: UR.process.steps[i].desc }))
+    : ADMISSION_STEPS;
   return (
     <section id="process" className="relative bg-white py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <SectionHeading
-          kicker="How to Apply"
+          kicker={isUr ? UR.process.kicker : "How to Apply"}
           title={
-            <>
-              Admission in <span className="text-gradient-navy-red">4 easy steps</span>
-            </>
+            isUr ? (
+              <>
+                {UR.process.titleA} <span className="text-gradient-navy-red">{UR.process.titleB}</span> {UR.process.titleC}
+              </>
+            ) : (
+              <>
+                Admission in <span className="text-gradient-navy-red">4 easy steps</span>
+              </>
+            )
           }
-          subtitle="From online application to your welcome kit — the whole journey is simple, guided and fast."
+          subtitle={
+            isUr
+              ? UR.process.subtitle
+              : "From online application to your welcome kit — the whole journey is simple, guided and fast."
+          }
         />
 
         <div className="relative grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
@@ -32,7 +48,7 @@ export function Process() {
             className="pointer-events-none absolute left-0 right-0 top-12 hidden h-0.5 bg-gradient-to-r from-navy-100 via-gold-400 to-navy-100 lg:block"
             aria-hidden
           />
-          {ADMISSION_STEPS.map((s, i) => {
+          {steps.map((s, i) => {
             const Icon = ICONS[s.icon as keyof typeof ICONS];
             return (
               <Reveal key={s.step} delay={0.1 * i}>
@@ -72,8 +88,8 @@ export function Process() {
               href="#apply"
               className="group inline-flex min-h-[54px] items-center gap-2.5 rounded-2xl bg-gradient-to-r from-navy-900 to-navy-800 px-8 py-4 text-base font-extrabold text-white shadow-xl shadow-navy-900/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
             >
-              Start Step 1 — Apply Online
-              <span className="grid size-6 place-items-center rounded-full bg-gold-400 text-navy-950 transition-transform duration-300 group-hover:translate-x-1">
+              {isUr ? UR.process.cta : "Start Step 1 — Apply Online"}
+              <span className="grid size-6 place-items-center rounded-full bg-gold-400 text-navy-950 transition-transform duration-300 group-hover:translate-x-1 rtl-mirror">
                 →
               </span>
             </a>

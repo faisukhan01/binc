@@ -13,12 +13,21 @@ import {
   Wallet,
 } from "lucide-react";
 import { FEE_INFO, PROGRAMS, SITE } from "@/lib/site-data";
+import { useT } from "@/lib/lang";
+import { UR } from "@/lib/i18n";
 import { Reveal, SectionHeading } from "./Reveal";
 
 const INCLUDE_ICONS = { FlaskConical, BookOpen, Stethoscope, BadgeCheck } as const;
 const PAYMENT_ICONS = { CalendarRange, Wallet, HeartHandshake } as const;
 
 export function Fees() {
+  const { isUr } = useT();
+  const includes = isUr
+    ? FEE_INFO.includes.map((f, i) => ({ ...f, label: UR.fees.includes[i].label, desc: UR.fees.includes[i].desc }))
+    : FEE_INFO.includes;
+  const payments = isUr
+    ? FEE_INFO.payment.map((p, i) => ({ ...p, title: UR.fees.payment[i].title, desc: UR.fees.payment[i].desc }))
+    : FEE_INFO.payment;
   return (
     <section id="fees" className="relative overflow-hidden bg-navy-50 py-20 sm:py-28">
       {/* decorative dots */}
@@ -32,18 +41,28 @@ export function Fees() {
       />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
         <SectionHeading
-          kicker="Fees & Payments"
+          kicker={isUr ? UR.fees.kicker : "Fees & Payments"}
           title={
-            <>
-              Transparent fees, <span className="text-gradient-navy-red">flexible plans</span>
-            </>
+            isUr ? (
+              <>
+                {UR.fees.titleA} <span className="text-gradient-navy-red">{UR.fees.titleB}</span>
+              </>
+            ) : (
+              <>
+                Transparent fees, <span className="text-gradient-navy-red">flexible plans</span>
+              </>
+            )
           }
-          subtitle="No hidden charges. Get the exact fee schedule for your program directly from our admissions office — instantly on WhatsApp."
+          subtitle={
+            isUr
+              ? UR.fees.subtitle
+              : "No hidden charges. Get the exact fee schedule for your program directly from our admissions office — instantly on WhatsApp."
+          }
         />
 
         {/* What your fee includes */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {FEE_INFO.includes.map((f, i) => {
+          {includes.map((f, i) => {
             const Icon = INCLUDE_ICONS[f.icon as keyof typeof INCLUDE_ICONS];
             return (
               <Reveal key={f.label} delay={0.07 * i}>
@@ -66,7 +85,7 @@ export function Fees() {
 
         {/* Payment options + program CTA row */}
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
-          {FEE_INFO.payment.map((p, i) => {
+          {payments.map((p, i) => {
             const Icon = PAYMENT_ICONS[p.icon as keyof typeof PAYMENT_ICONS];
             const highlight = p.icon === "HeartHandshake";
             return (
@@ -109,22 +128,28 @@ export function Fees() {
               <div>
                 <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.25em] text-gold-400">
                   <Info className="size-3.5" />
-                  Exact Fee Schedule
+                  {isUr ? UR.fees.panelKicker : "Exact Fee Schedule"}
                 </p>
                 <h3 className="mt-4 font-display text-2xl sm:text-3xl font-black text-white">
-                  Get your program&apos;s fee schedule in <span className="text-gradient-gold">under a minute</span>
+                  {isUr ? (
+                    <>
+                      {UR.fees.panelTitleA} <span className="text-gradient-gold">{UR.fees.panelTitleB}</span> {UR.fees.panelTitleC}
+                    </>
+                  ) : (
+                    <>
+                      Get your program&apos;s fee schedule in <span className="text-gradient-gold">under a minute</span>
+                    </>
+                  )}
                 </h3>
                 <p className="mt-3 max-w-xl text-sm leading-relaxed text-navy-100/80 sm:text-base">
-                  Fee amounts vary by session and university affiliation, so our admissions team
-                  shares the current official schedule personally — including installment options
-                  and any welfare support you qualify for.
+                  {isUr ? UR.fees.panelBody : "Fee amounts vary by session and university affiliation, so our admissions team shares the current official schedule personally — including installment options and any welfare support you qualify for."}
                 </p>
                 <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-navy-100/75">
                   <span className="inline-flex items-center gap-2">
-                    <ShieldCheck className="size-4.5 text-gold-400" /> Official & current rates
+                    <ShieldCheck className="size-4.5 text-gold-400" /> {isUr ? UR.fees.chipOfficial : "Official & current rates"}
                   </span>
                   <span className="inline-flex items-center gap-2">
-                    <BadgeCheck className="size-4.5 text-gold-400" /> Installment eligibility check
+                    <BadgeCheck className="size-4.5 text-gold-400" /> {isUr ? UR.fees.chipInstallment : "Installment eligibility check"}
                   </span>
                 </div>
               </div>
@@ -146,13 +171,13 @@ export function Fees() {
                         </svg>
                       </span>
                       <span>
-                        {p.title} fee schedule
+                        {isUr ? `${p.title} ${UR.fees.feeSchedule}` : `${p.title} fee schedule`}
                         <span className="block text-[11px] font-medium text-navy-100/60">
                           {p.duration} · {p.full}
                         </span>
                       </span>
                     </span>
-                    <span className="text-gold-400 transition-transform duration-300 group-hover:translate-x-1">
+                    <span className="text-gold-400 transition-transform duration-300 group-hover:translate-x-1 rtl-mirror">
                       →
                     </span>
                   </a>

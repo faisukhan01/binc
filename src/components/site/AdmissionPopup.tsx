@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CalendarDays, Clock3, Sparkles, X } from "lucide-react";
+import { CalendarDays, Clock3, Hourglass, Sparkles, X } from "lucide-react";
 import { SITE } from "@/lib/site-data";
+import { useT } from "@/lib/lang";
+import { UR } from "@/lib/i18n";
 
 const SPARKS = [
   { left: "6%", top: "12%", size: 14, delay: 0 },
@@ -16,6 +18,21 @@ const SPARKS = [
 
 export function AdmissionPopup() {
   const [open, setOpen] = useState(false);
+  const [daysLeft, setDaysLeft] = useState<number | null>(null);
+  const { isUr } = useT();
+
+  // Deadline awareness — staff-configured countdown from /api/settings
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        const dl = d?.settings?.admissionDeadline;
+        if (!dl) return;
+        const ms = new Date(`${dl}T23:59:59`).getTime() - Date.now();
+        if (ms > 0) setDaysLeft(Math.ceil(ms / 86_400_000));
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
@@ -85,12 +102,18 @@ export function AdmissionPopup() {
                 <Sparkles className="size-9 text-navy-950" />
               </motion.div>
               <p className="relative text-[11px] font-extrabold uppercase tracking-[0.35em] text-gold-400">
-                Bright International College
+                {isUr ? UR.popup.kicker : "Bright International College"}
               </p>
               <h3 className="relative mt-2 font-display text-4xl font-black text-white sm:text-5xl">
-                Admissions
-                <span className="block text-gradient-gold">OPEN — Fall 26</span>
+                {isUr ? UR.popup.titleA : "Admissions"}
+                <span className="block text-gradient-gold">{isUr ? UR.popup.titleB : "OPEN — Fall 26"}</span>
               </h3>
+              {daysLeft !== null && (
+                <p className="relative mx-auto mt-3 inline-flex items-center gap-1.5 rounded-full bg-brand-red/90 px-3.5 py-1 text-[11px] font-extrabold text-white shadow-lg">
+                  <Hourglass className="size-3.5" />
+                  {(isUr ? UR.popup.daysLeft : "Only {n} days left to apply!").replace("{n}", String(daysLeft))}
+                </p>
+              )}
               {/* sparkles */}
               {SPARKS.map((s, i) => (
                 <span
@@ -119,25 +142,24 @@ export function AdmissionPopup() {
                   <CalendarDays className="size-5 shrink-0 text-navy-700" />
                   <div className="leading-tight">
                     <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                      Session Starts
+                      {isUr ? UR.popup.sessionLabel : "Session Starts"}
                     </p>
-                    <p className="text-sm font-extrabold text-navy-900">September 2026</p>
+                    <p className="text-sm font-extrabold text-navy-900">{isUr ? UR.popup.sessionValue : "September 2026"}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2.5 rounded-xl bg-red-50 px-3.5 py-3">
                   <Clock3 className="size-5 shrink-0 text-brand-red" />
                   <div className="leading-tight">
                     <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                      Limited Seats
+                      {isUr ? UR.popup.seatsLabel : "Limited Seats"}
                     </p>
-                    <p className="text-sm font-extrabold text-brand-red">First Come Basis</p>
+                    <p className="text-sm font-extrabold text-brand-red">{isUr ? UR.popup.seatsValue : "First Come Basis"}</p>
                   </div>
                 </div>
               </div>
 
               <p className="mt-4 text-center text-sm leading-relaxed text-muted-foreground">
-                Pharm-D · DPT · BSCS — apply online in under 2 minutes and our
-                admissions team will call you back the same day.
+                {isUr ? UR.popup.body : "Pharm-D · DPT · BSCS — apply online in under 2 minutes and our admissions team will call you back the same day."}
               </p>
 
               <div className="mt-5 grid gap-2.5">
@@ -146,8 +168,8 @@ export function AdmissionPopup() {
                   onClick={() => setOpen(false)}
                   className="group inline-flex min-h-[52px] items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-brand-red to-brand-redlight px-6 py-3.5 text-base font-extrabold text-white shadow-lg shadow-brand-red/40 transition-all hover:-translate-y-0.5 hover:shadow-xl"
                 >
-                  Apply Online Now
-                  <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+                  {isUr ? UR.popup.apply : "Apply Online Now"}
+                  <span className="transition-transform duration-300 group-hover:translate-x-1 rtl-mirror">→</span>
                 </a>
                 <a
                   href={`https://wa.me/${SITE.whatsappIntl}`}
@@ -163,14 +185,14 @@ export function AdmissionPopup() {
                 onClick={() => setOpen(false)}
                 className="mt-4 w-full text-center text-xs font-semibold text-muted-foreground hover:text-navy-900 transition-colors"
               >
-                Maybe later — continue browsing
+                {isUr ? UR.popup.later : "Maybe later — continue browsing"}
               </button>
             </div>
 
             {/* Close */}
             <button
               onClick={() => setOpen(false)}
-              aria-label="Close announcement"
+              aria-label={isUr ? UR.popup.close : "Close announcement"}
               className="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-white/15 text-white backdrop-blur transition-colors hover:bg-white hover:text-navy-950"
             >
               <X className="size-5" />
