@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowDown, GraduationCap, ShieldCheck, Users } from "lucide-react";
+import { ArrowDown, Download, GraduationCap, ShieldCheck, Users } from "lucide-react";
 import { SITE } from "@/lib/site-data";
 
 const HEADLINE = ["Build", "a", "Brighter", "Future."];
@@ -158,6 +158,16 @@ export function Hero() {
                 className="inline-flex min-h-[52px] items-center gap-2 rounded-2xl border border-white/25 bg-white/10 px-7 py-3.5 text-base font-bold text-white backdrop-blur-md transition-all duration-300 hover:bg-white hover:text-navy-900"
               >
                 Explore Programs
+              </a>
+              <a
+                href="/prospectus/binc-prospectus-2026.pdf"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Download the official BINC prospectus PDF for Fall 2026"
+                className="group inline-flex min-h-[52px] items-center gap-2 rounded-2xl border border-gold-400/40 bg-gold-400/10 px-5 py-3.5 text-sm font-bold text-gold-300 backdrop-blur-md transition-all duration-300 hover:bg-gold-400 hover:text-navy-950"
+              >
+                <Download className="size-4.5 transition-transform duration-300 group-hover:translate-y-0.5" />
+                Prospectus 2026
               </a>
               <a
                 href={`https://wa.me/${SITE.whatsappIntl}`}

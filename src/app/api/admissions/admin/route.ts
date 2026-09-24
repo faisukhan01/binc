@@ -5,8 +5,56 @@ import { db } from "@/lib/db";
 /**
  * Admin Console API — protected by a shared passcode (adminKey body field).
  * Default passcode: "binc-admin-2026" (override with ADMIN_PASSCODE env var).
+ * Brute-force protection: max 6 failed attempts per IP per 10-minute window.
  */
 const ADMIN_PASSCODE = process.env.ADMIN_PASSCODE || "binc-admin-2026";
+
+const RATE_LIMIT_MAX = 6; // resets on module reload (dev recompiles); 10-min lock in prod
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+
+/** In-memory failed-attempt tracker: ip -> { count, windowStart, blockedUntil } */
+const attempts = new Map<
+  string,
+  { count: number; windowStart: number; blockedUntil: number }
+>();
+
+function checkRateLimit(ip: string): { ok: boolean; retryAfterSec?: number } {
+  const now = Date.now();
+  const rec = attempts.get(ip);
+
+  if (rec?.blockedUntil && rec.blockedUntil > now) {
+    return { ok: false, retryAfterSec: Math.ceil((rec.blockedUntil - now) / 1000) };
+  }
+  if (!rec || now - rec.windowStart > RATE_LIMIT_WINDOW_MS) {
+    attempts.set(ip, { count: 0, windowStart: now, blockedUntil: 0 });
+  }
+  return { ok: true };
+}
+
+function recordFailure(ip: string): { blocked: boolean; retryAfterSec?: number } {
+  const now = Date.now();
+  const rec = attempts.get(ip) ?? { count: 0, windowStart: now, blockedUntil: 0 };
+  if (now - rec.windowStart > RATE_LIMIT_WINDOW_MS) {
+    rec.count = 0;
+    rec.windowStart = now;
+  }
+  rec.count += 1;
+  if (rec.count >= RATE_LIMIT_MAX) {
+    rec.blockedUntil = now + RATE_LIMIT_WINDOW_MS;
+  }
+  attempts.set(ip, rec);
+  return rec.blockedUntil > now
+    ? { blocked: true, retryAfterSec: Math.ceil((rec.blockedUntil - now) / 1000) }
+    : { blocked: false };
+}
+
+function clientIp(req: NextRequest): string {
+  return (
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "local"
+  );
+}
 
 const VALID_STATUSES = ["PENDING", "CONTACTED", "APPROVED", "REJECTED"] as const;
 
@@ -27,10 +75,29 @@ function isAuthed(adminKey: string): boolean {
 /** POST — authenticate + list all applications with stats */
 export async function POST(req: NextRequest) {
   try {
+    const ip = clientIp(req);
+    const rl = checkRateLimit(ip);
+    if (!rl.ok) {
+      return NextResponse.json(
+        { error: `Too many failed attempts. Try again in ${Math.ceil((rl.retryAfterSec ?? 60) / 60)} minute(s).` },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfterSec ?? 60) } }
+      );
+    }
+
     const parsed = authSchema.safeParse(await req.json());
     if (!parsed.success || !isAuthed(parsed.data.adminKey)) {
+      const fail = recordFailure(ip);
+      if (fail.blocked) {
+        return NextResponse.json(
+          { error: `Too many failed attempts. Locked for ${Math.ceil((fail.retryAfterSec ?? 600) / 60)} minute(s).` },
+          { status: 429, headers: { "Retry-After": String(fail.retryAfterSec ?? 600) } }
+        );
+      }
       return NextResponse.json({ error: "Invalid passcode" }, { status: 401 });
     }
+
+    // Successful auth clears the failure counter for this IP
+    attempts.delete(ip);
 
     const [applications, total, pending, contacted, approved, rejected, welfare, byProgram] =
       await Promise.all([

@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bright International College — Prospectus Fall 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+@page { size: 720px 1020px; margin: 0; }
+
+:root {
+  --navy: #071d49;
+  --navy-soft: #12306b;
+  --gold: #d9a62e;
+  --red: #c71920;
+  --green: #12633b;
+  --paper: #ffffff;
+  --mist: #f2f5fa;
+  --ink: #22304a;
+  --muted: #5a6b88;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 720px;
+  background: var(--navy);
+  color: var(--ink);
+  font-family: 'Inter', sans-serif;
+  font-size: 13.5px;
+  line-height: 1.65;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+@media screen {
+  html { height: auto; display: flex; justify-content: center; background: #0b1220; }
+  body { margin: 24px auto; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+}
+
+/* ============ COVER ============ */
+.cover {
+  width: 720px;
+  height: 1020px;
+  box-sizing: border-box;
+  break-after: page;
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(160deg, #0a2456 0%, var(--navy) 46%, #050f2b 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 64px 60px;
+}
+.cover .deco-layer {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+}
+.cover .deco-ring {
+  position: absolute; border-radius: 50%; border: 1.5px solid rgba(217,166,46,.35);
+}
+.cover .ring-1 { width: 340px; height: 340px; top: -120px; right: -100px; }
+.cover .ring-2 { width: 220px; height: 220px; top: -60px; right: 60px; border-color: rgba(255,255,255,.12); }
+.cover .ring-3 { width: 420px; height: 420px; bottom: -180px; left: -160px; border-color: rgba(199,25,32,.28); }
+.cover .grid-lines {
+  position: absolute; inset: 0; opacity: .05;
+  background-image: repeating-linear-gradient(-45deg, transparent 0 26px, #ffffff 26px 27px);
+}
+.cover .grid-lines, .cover .deco-ring { position: absolute; }
+.cover .crest {
+  position: relative;
+  width: 108px; height: 108px; border-radius: 50%;
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 6px rgba(217,166,46,.35), 0 18px 40px rgba(0,0,0,.45);
+  margin-bottom: 26px;
+}
+.cover .crest img { width: 84px; height: 84px; object-fit: contain; }
+.cover .kicker {
+  position: relative;
+  font-size: 11px; font-weight: 800; letter-spacing: .42em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 18px;
+}
+.cover h1 {
+  position: relative;
+  font-family: 'Playfair Display', serif;
+  font-size: 54px; line-height: 1.06; font-weight: 900; margin: 0;
+}
+.cover h1 .line { display: block; }
+.cover h1 .line.gold { color: var(--gold); }
+.cover .tagline {
+  position: relative; margin-top: 16px;
+  font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: 17px; color: rgba(255,255,255,.85);
+}
+.cover .rule {
+  position: relative; width: 72px; height: 3px; margin: 28px auto 44px auto;
+  background: linear-gradient(90deg, var(--red), var(--gold), var(--red)); border-radius: 2px;
+}
+.cover .chips { position: relative; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.cover .chip {
+  border: 1px solid rgba(255,255,255,.28); background: rgba(255,255,255,.08);
+  padding: 9px 18px; border-radius: 999px; font-size: 12.5px; font-weight: 700; letter-spacing: .04em;
+}
+.cover .chip b { color: var(--gold); }
+.cover .edition {
+  position: absolute; bottom: 44px; left: 0; right: 0;
+  font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: rgba(255,255,255,.55); font-weight: 600;
+}
+.cover .contact-strip {
+  position: absolute; bottom: 88px; left: 60px; right: 60px;
+  display: flex; justify-content: center; gap: 18px; flex-wrap: wrap;
+  font-size: 11.5px; color: rgba(255,255,255,.75); font-weight: 500;
+}
+
+/* ============ FLOWING CONTENT ============ */
+.main-content {
+  background: var(--paper);
+  padding: 58px 62px 44px 62px;
+}
+.chapter { break-after: avoid; break-inside: avoid; margin-top: 26px; }
+.chapter:first-child { margin-top: 0; }
+.kicker {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 10.5px; font-weight: 800; letter-spacing: .32em; text-transform: uppercase; color: var(--red);
+}
+.kicker::before { content: ""; width: 26px; height: 2px; background: var(--gold); border-radius: 2px; }
+.chapter h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px; font-weight: 900; color: var(--navy); margin: 8px 0 0 0; line-height: 1.15;
+}
+.chapter .lede { margin: 10px 0 0 0; color: var(--muted); font-size: 13.5px; }
+.body-text { margin: 13px 0 0 0; color: var(--ink); }
+.body-text b { color: var(--navy); }
+
+/* stats band */
+.stat-band {
+  break-inside: avoid;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  margin-top: 18px;
+}
+.stat-cell {
+  background: var(--mist); border-radius: 14px; padding: 14px 10px; text-align: center;
+  border-bottom: 3px solid var(--gold);
+}
+.stat-cell .num { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; color: var(--navy); line-height: 1; }
+.stat-cell .lbl { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+
+/* program cards */
+.program {
+  break-inside: avoid;
+  border: 1px solid #e3e9f2; border-radius: 18px; overflow: hidden;
+  margin-top: 16px;
+  box-shadow: 0 10px 26px rgba(7,29,73,.07);
+}
+.program .banner { position: relative; height: 148px; }
+.program .banner img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.program .banner .shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7,29,73,.06) 0%, rgba(7,29,73,.78) 100%); }
+.program .banner .titles { position: absolute; left: 20px; bottom: 12px; color: #fff; }
+.program .banner .titles h3 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 900; margin: 0; line-height: 1; }
+.program .banner .titles p { margin: 3px 0 0 0; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.85); }
+.program .banner .dur {
+  position: absolute; right: 14px; top: 12px;
+  background: rgba(255,255,255,.94); color: var(--navy);
+  font-size: 10.5px; font-weight: 800; padding: 5px 11px; border-radius: 999px; letter-spacing: .06em;
+}
+.program .inner { padding: 16px 20px 18px 20px; }
+.program .inner p { margin: 0; color: var(--ink); }
+.program .label {
+  font-size: 10px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; color: var(--navy);
+  margin-top: 14px;
+}
+.program .label.first { margin-top: 0; }
+.program ul { margin: 7px 0 0 0; padding: 0; list-style: none; }
+.program ul li {
+  position: relative; padding-left: 20px; margin-top: 5px; font-size: 12.5px; color: var(--ink);
+}
+.program ul li::before {
+  content: ""; position: absolute; left: 0; top: 6px;
+  width: 11px; height: 11px; border-radius: 4px; background: var(--gold);
+  -webkit-mask: radial-gradient(circle at center, #000 62%, transparent 64%);
+  mask: radial-gradient(circle at center, #000 62%, transparent 64%);
+}
+.program .years { margin-top: 7px; border-left: 2px dashed #d5deec; padding-left: 14px; }
+.program .years .yr { display: flex; gap: 10px; margin-top: 5px; }
+.program .years .yr:first-child { margin-top: 0; }
+.program .years .tag {
+  flex: 0 0 52px; font-size: 10px; font-weight: 800; color: var(--red); letter-spacing: .05em; padding-top: 1px;
+}
+.program .years .txt { font-size: 12px; color: var(--muted); }
+.career-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.career-chips span {
+  background: var(--mist); border: 1px solid #e0e7f2; color: var(--navy);
+  font-size: 10.5px; font-weight: 700; padding: 4px 11px; border-radius: 999px;
+}
+
+/* welfare panel */
+.welfare {
+  break-inside: avoid;
+  margin-top: 16px; border-radius: 18px; overflow: hidden; color: #fff;
+  background: linear-gradient(150deg, #14683f 0%, var(--green) 55%, #0c4a2d 100%);
+  padding: 24px 26px;
+}
+.welfare h3 { font-family: 'Playfair Display', serif; font-size: 23px; font-weight: 900; margin: 0; }
+.welfare p { margin: 10px 0 0 0; color: rgba(255,255,255,.92); font-size: 12.8px; }
+.welfare .cov {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 14px;
+}
+.welfare .cov span {
+  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22);
+  border-radius: 10px; padding: 8px 12px; font-size: 11.5px; font-weight: 600;
+}
+.welfare .cov b { color: #ffe9a8; }
+
+/* process steps */
+.steps { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.step {
+  break-inside: avoid;
+  background: var(--mist); border-radius: 14px; padding: 15px 16px;
+  border-top: 3px solid var(--red);
+}
+.step .no {
+  font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 900; color: var(--red);
+}
+.step h4 { margin: 4px 0 0 0; font-size: 13.5px; font-weight: 800; color: var(--navy); }
+.step p { margin: 5px 0 0 0; font-size: 11.8px; color: var(--muted); }
+
+/* two-col docs + fees */
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.panel {
+  break-inside: avoid;
+  border: 1px solid #e3e9f2; border-radius: 16px; padding: 17px 18px;
+}
+.panel.gold-top { border-top: 4px solid var(--gold); }
+.panel.navy-top { border-top: 4px solid var(--navy); }
+.panel h4 { margin: 0; font-size: 14px; font-weight: 800; color: var(--navy); }
+.panel p { margin: 8px 0 0 0; font-size: 12px; color: var(--muted); }
+.check-list { margin: 9px 0 0 0; padding: 0; list-style: none; }
+.check-list li { position: relative; padding-left: 20px; margin-top: 6px; font-size: 12px; color: var(--ink); }
+.check-list li::before {
+  content: ""; position: absolute; left: 0; top: 3px; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--green);
+  -webkit-mask: conic-gradient(from 45deg at 50% 50%, #000 0 200deg, transparent 200deg);
+  mask: none;
+}
+.check-list li::before { content: "✓"; background: none; -webkit-mask: none; mask: none; color: var(--green); font-weight: 900; font-size: 12px; left: 0; top: 0; }
+.pay-row { display: flex; gap: 10px; margin-top: 9px; }
+.pay-card { flex: 1; background: var(--mist); border-radius: 10px; padding: 9px 11px; }
+.pay-card b { display: block; font-size: 11.5px; color: var(--navy); }
+.pay-card span { font-size: 10.8px; color: var(--muted); line-height: 1.45; display: block; margin-top: 3px; }
+.fee-note {
+  margin-top: 10px; background: rgba(217,166,46,.14); border: 1px solid rgba(217,166,46,.45);
+  border-radius: 10px; padding: 9px 12px; font-size: 11.3px; color: #6b5312;
+}
+
+/* campus gallery strip */
+.shots { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 14px; }
+.shot { break-inside: avoid; border-radius: 14px; overflow: hidden; position: relative; height: 128px; }
+.shot img { width: 100%; height: 100%; object-fit: cover; }
+.shot figcaption {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 10px 8px 10px;
+  background: linear-gradient(180deg, transparent, rgba(7,29,73,.85));
+  color: #fff; font-size: 10.5px; font-weight: 700;
+}
+
+/* faq */
+.faq {
+  break-inside: avoid;
+  border: 1px solid #e3e9f2; border-left: 4px solid var(--gold);
+  border-radius: 12px; padding: 13px 16px; margin-top: 12px; background: #fcfdff;
+}
+.faq .q { font-weight: 800; color: var(--navy); font-size: 13px; }
+.faq .a { margin: 5px 0 0 0; font-size: 12.2px; color: var(--muted); }
+
+/* contact block */
+.contact {
+  break-inside: avoid;
+  margin-top: 16px; border-radius: 18px; background: var(--navy); color: #fff; padding: 24px 26px;
+}
+.contact h3 { font-family: 'Playfair Display', serif; font-size: 23px; font-weight: 900; margin: 0; }
+.contact .rows { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 18px; margin-top: 14px; }
+.contact .row { display: flex; gap: 9px; align-items: flex-start; }
+.contact .row .ic {
+  flex: 0 0 30px; height: 30px; border-radius: 9px; background: rgba(217,166,46,.18);
+  border: 1px solid rgba(217,166,46,.4); display: flex; align-items: center; justify-content: center;
+  color: var(--gold); font-size: 13px; font-weight: 900;
+}
+.contact .row .k { font-size: 10px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.55); }
+.contact .row .v { font-size: 12.3px; font-weight: 700; margin-top: 2px; }
+.contact .apply-strip {
+  margin-top: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: linear-gradient(90deg, var(--red), #e2442f); border-radius: 12px; padding: 12px 16px;
+}
+.contact .apply-strip .t { font-size: 12.5px; font-weight: 800; }
+.contact .apply-strip .n { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 900; white-space: nowrap; }
+
+/* ============ ENDING ============ */
+.ending {
+  width: 720px; height: 1020px; box-sizing: border-box;
+  break-before: page; overflow: hidden; position: relative;
+  background: linear-gradient(200deg, #0a2456 0%, var(--navy) 50%, #050f2b 100%);
+  color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center;
+  text-align: center; padding: 70px 64px;
+}
+.ending .deco-layer {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+}
+.ending .deco-ring { position: absolute; border-radius: 50%; border: 1.5px solid rgba(217,166,46,.3); }
+.ending .ring-a { width: 380px; height: 380px; top: -140px; left: -130px; }
+.ending .ring-b { width: 260px; height: 260px; bottom: -90px; right: -70px; border-color: rgba(199,25,32,.3); }
+.ending .big {
+  position: relative; font-family: 'Playfair Display', serif; font-weight: 900;
+  font-size: 46px; line-height: 1.1;
+}
+.ending .big .line { display: block; }
+.ending .big .line.gold { color: var(--gold); }
+.ending .sub { position: relative; margin-top: 18px; max-width: 460px; color: rgba(255,255,255,.85); font-size: 14px; }
+.ending .contacts {
+  position: relative; margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 26px;
+  text-align: left; max-width: 480px;
+}
+.ending .contacts .k { font-size: 10px; font-weight: 800; letter-spacing: .22em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+.ending .contacts .v { font-size: 12.5px; font-weight: 700; margin-top: 2px; }
+.ending .foot {
+  position: absolute; bottom: 46px; left: 0; right: 0;
+  font-size: 10.5px; letter-spacing: .28em; text-transform: uppercase; color: rgba(255,255,255,.5); font-weight: 600;
+}
+</style>
+</head>
+<body>
+
+<!-- ================= COVER ================= -->
+<div class="cover">
+  <div class="deco-layer">
+    <div class="deco-ring ring-1"></div>
+    <div class="deco-ring ring-2"></div>
+    <div class="deco-ring ring-3"></div>
+    <div class="grid-lines"></div>
+  </div>
+
+  <div class="crest"><img src="../images/logo.jpg" alt="Bright International College logo"></div>
+  <div class="kicker">Admissions Open · Fall 2026</div>
+  <h1><span class="line">Bright</span><span class="line">International</span><span class="line gold">College</span></h1>
+  <p class="tagline">Excellence in Education — building careers that matter.</p>
+  <div class="rule"></div>
+  <div class="chips">
+    <span class="chip"><b>Pharm-D</b> · 5 Years</span>
+    <span class="chip"><b>DPT</b> · 5 Years</span>
+    <span class="chip"><b>BSCS</b> · 4 Years</span>
+  </div>
+  <div class="contact-strip">
+    <span>0324-3334977</span><span>042-35154958</span><span>info@binc.edu.pk</span>
+  </div>
+  <div class="edition">Official Prospectus · Session 2026–27 · Lahore</div>
+</div>
+
+<!-- ================= FLOWING BODY ================= -->
+<div class="main-content">
+
+  <!-- ABOUT -->
+  <div class="chapter">
+    <span class="kicker">Welcome</span>
+    <h2>A campus that feels like family</h2>
+    <p class="lede">Bright International College, Township, Lahore — where professional degrees meet personal attention.</p>
+  </div>
+  <p class="body-text">
+    Bright International College (BINC) is a career-focused institution in the heart of GECHS
+    Township, Lahore, offering three high-demand professional degrees: <b>Pharm-D</b>, <b>Doctor of
+    Physical Therapy (DPT)</b> and <b>BS Computer Science (BSCS)</b>. Our mission is simple — make
+    quality professional education accessible, affordable and genuinely career-building for every
+    student who walks through our gates.
+  </p>
+  <p class="body-text">
+    Small classes mean our faculty knows every student by name. Modern laboratories, structured
+    hospital rotations and industry mentorship ensure that learning never stays limited to
+    textbooks. Whether you dream of wearing a pharmacist's coat, running a rehabilitation clinic,
+    or building the next great software product, Bright gives you the environment, the mentoring
+    and the confidence to get there.
+  </p>
+  <p class="body-text">
+    We are equally proud of our <b>social welfare commitment</b>: through the welfare foundation
+    (PWWF), eligible welfare workers and their families receive complete admission support —
+    because we believe financial circumstances should never stand between a hardworking family and
+    a professional education.
+  </p>
+  <div class="stat-band">
+    <div class="stat-cell"><div class="num">1200+</div><div class="lbl">Students &amp; Alumni</div></div>
+    <div class="stat-cell"><div class="num">3</div><div class="lbl">Professional Degrees</div></div>
+    <div class="stat-cell"><div class="num">100%</div><div class="lbl">Welfare Support</div></div>
+    <div class="stat-cell"><div class="num">6+</div><div class="lbl">Years of Service</div></div>
+  </div>
+
+  <!-- PROGRAMS -->
+  <div class="chapter">
+    <span class="kicker">Programs Offered</span>
+    <h2>Choose your professional degree</h2>
+    <p class="lede">Three career-focused programs — each combining strong academics with practical, real-world training.</p>
+  </div>
+
+  <!-- Pharm-D -->
+  <div class="program">
+    <div class="banner">
+      <img src="../images/program-pharm-d.png" alt="Pharm-D at Bright International College">
+      <div class="shade"></div>
+      <span class="dur">5 YEARS</span>
+      <div class="titles"><h3>Pharm-D</h3><p>Doctor of Pharmacy</p></div>
+    </div>
+    <div class="inner">
+      <p>Pharm-D is a five-year professional doctorate that trains you to become a licensed pharmacy
+      professional — from the science behind medicines to hands-on patient care in hospitals and
+      community pharmacies. Graduates step into one of healthcare's most trusted and
+      consistently in-demand professions.</p>
+      <p class="label first">Who can apply</p>
+      <ul>
+        <li>Intermediate (FSc Pre-Medical) or equivalent qualification</li>
+        <li>Original academic documents — Matric &amp; Intermediate certificates</li>
+        <li>CNIC / B-Form and recent passport-size photographs</li>
+      </ul>
+      <p class="label">The five-year journey</p>
+      <div class="years">
+        <div class="yr"><span class="tag">Year 1</span><span class="txt">Anatomy, physiology &amp; pharmaceutical chemistry foundations</span></div>
+        <div class="yr"><span class="tag">Year 2</span><span class="txt">Pharmacology &amp; pharmaceutics — how drugs work and are formulated</span></div>
+        <div class="yr"><span class="tag">Year 3</span><span class="txt">Pharmaceutical technology &amp; medicinal chemistry</span></div>
+        <div class="yr"><span class="tag">Year 4</span><span class="txt">Clinical, hospital &amp; community pharmacy practice</span></div>
+        <div class="yr"><span class="tag">Year 5</span><span class="txt">Clinical rotations, research project &amp; professional internship</span></div>
+      </div>
+      <p class="label">Career pathways</p>
+      <div class="career-chips">
+        <span>Community Pharmacist</span><span>Hospital Pharmacist</span><span>Pharma Industry</span><span>Research</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DPT -->
+  <div class="program">
+    <div class="banner">
+      <img src="../images/dpt.png" alt="DPT at Bright International College">
+      <div class="shade"></div>
+      <span class="dur">5 YEARS</span>
+      <div class="titles"><h3>DPT</h3><p>Doctor of Physical Therapy</p></div>
+    </div>
+    <div class="inner">
+      <p>DPT is a five-year clinical doctorate focused on physical rehabilitation. Students learn to
+      assess, diagnose and treat movement disorders through evidence-based therapy — in hospitals,
+      sports settings and private practice. Training combines modern rehabilitation laboratories
+      with supervised clinical placements from the early years onward.</p>
+      <p class="label first">Who can apply</p>
+      <ul>
+        <li>Intermediate (FSc Pre-Medical) or equivalent qualification</li>
+        <li>Original academic documents — Matric &amp; Intermediate certificates</li>
+        <li>CNIC / B-Form and recent passport-size photographs</li>
+      </ul>
+      <p class="label">The five-year journey</p>
+      <div class="years">
+        <div class="yr"><span class="tag">Year 1</span><span class="txt">Basic medical sciences — anatomy, physiology &amp; kinesiology</span></div>
+        <div class="yr"><span class="tag">Year 2</span><span class="txt">Pathology, pharmacology &amp; biomechanics</span></div>
+        <div class="yr"><span class="tag">Year 3</span><span class="txt">Therapeutic exercise, electrotherapy &amp; assessment skills</span></div>
+        <div class="yr"><span class="tag">Year 4</span><span class="txt">Musculoskeletal, neuro &amp; cardiopulmonary rehabilitation</span></div>
+        <div class="yr"><span class="tag">Year 5</span><span class="txt">Supervised clinical internships &amp; research project</span></div>
+      </div>
+      <p class="label">Career pathways</p>
+      <div class="career-chips">
+        <span>Clinical DPT</span><span>Sports Rehab</span><span>Rehab Centers</span><span>Private Practice</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BSCS -->
+  <div class="program">
+    <div class="banner">
+      <img src="../images/program-bscs.png" alt="BSCS at Bright International College">
+      <div class="shade"></div>
+      <span class="dur">4 YEARS</span>
+      <div class="titles"><h3>BSCS</h3><p>BS Computer Science</p></div>
+    </div>
+    <div class="inner">
+      <p>BSCS is a four-year computing degree built around real-world projects. From programming
+      fundamentals to modern artificial intelligence and data science, the program blends strong
+      theory with practical labs, industry mentorship and a final-year project that becomes the
+      centrepiece of your professional portfolio.</p>
+      <p class="label first">Who can apply</p>
+      <ul>
+        <li>Intermediate (ICS / FSc / ICom / DAE) or equivalent qualification</li>
+        <li>Original academic documents — Matric &amp; Intermediate certificates</li>
+        <li>CNIC / B-Form and recent passport-size photographs</li>
+      </ul>
+      <p class="label">The four-year journey</p>
+      <div class="years">
+        <div class="yr"><span class="tag">Year 1</span><span class="txt">Programming fundamentals, mathematics &amp; IT essentials</span></div>
+        <div class="yr"><span class="tag">Year 2</span><span class="txt">Data structures, OOP &amp; database systems</span></div>
+        <div class="yr"><span class="tag">Year 3</span><span class="txt">Software engineering, operating systems, networks &amp; AI</span></div>
+        <div class="yr"><span class="tag">Year 4</span><span class="txt">Specialization electives, final-year project &amp; internship</span></div>
+      </div>
+      <p class="label">Career pathways</p>
+      <div class="career-chips">
+        <span>Software Engineer</span><span>AI / Data Science</span><span>Cyber Security</span><span>Entrepreneurship</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- WELFARE -->
+  <div class="chapter">
+    <span class="kicker">Welfare &amp; Scholarships</span>
+    <h2>Education support that changes lives</h2>
+  </div>
+  <div class="welfare">
+    <h3>100% Admission FREE for eligible welfare workers</h3>
+    <p>
+      In partnership with the social welfare foundation (PWWF), Bright International College
+      offers complete admission support to eligible welfare workers and their families. This is not
+      a partial discount — it is full support through the admission journey, reflecting our belief
+      that those who serve the community deserve a door into professional education.
+    </p>
+    <p>
+      Our welfare desk verifies eligibility personally and walks each approved family through
+      every step — documentation, admission and enrollment — with zero stress and zero hidden
+      conditions.
+    </p>
+    <div class="cov">
+      <span><b>100% admission support</b> for eligible PWWF welfare workers</span>
+      <span><b>Personal verification</b> — visit or WhatsApp the welfare desk</span>
+      <span><b>Guidance at every step</b> — documents to enrollment</span>
+      <span><b>All three programs</b> — Pharm-D, DPT &amp; BSCS included</span>
+    </div>
+  </div>
+
+  <!-- ADMISSION PROCESS -->
+  <div class="chapter">
+    <span class="kicker">How to Apply</span>
+    <h2>Four simple steps to your seat</h2>
+    <p class="lede">The whole journey takes less than two minutes to start — and our team guides you through the rest.</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="no">01</div>
+      <h4>Apply Online</h4>
+      <p>Fill the online admission form at www.binc.edu.pk with your details and preferred program. It takes less than two minutes, and you receive a tracking code instantly.</p>
+    </div>
+    <div class="step">
+      <div class="no">02</div>
+      <h4>Admissions Team Calls You</h4>
+      <p>Our admissions office contacts you on WhatsApp or phone to verify your details, answer questions and guide the next steps — usually the same day.</p>
+    </div>
+    <div class="step">
+      <div class="no">03</div>
+      <h4>Submit Documents</h4>
+      <p>Bring your academic documents, CNIC/B-Form and photographs to the campus — or send clear scans to us on WhatsApp for pre-verification.</p>
+    </div>
+    <div class="step">
+      <div class="no">04</div>
+      <h4>Confirm Your Seat</h4>
+      <p>Pay the admission dues, receive your fee schedule and welcome kit — and your Bright journey officially begins.</p>
+    </div>
+  </div>
+
+  <!-- DOCUMENTS + FEES -->
+  <div class="chapter">
+    <span class="kicker">Documents &amp; Fees</span>
+    <h2>What you need, what you pay</h2>
+  </div>
+  <div class="duo">
+    <div class="panel navy-top">
+      <h4>Documents required</h4>
+      <p>Bring the originals to campus for verification; copies are retained with your file.</p>
+      <ul class="check-list">
+        <li>Matric certificate &amp; detailed marks sheet</li>
+        <li>Intermediate certificate &amp; detailed marks sheet</li>
+        <li>CNIC or B-Form (student &amp; guardian)</li>
+        <li>Recent passport-size photographs</li>
+      </ul>
+    </div>
+    <div class="panel gold-top">
+      <h4>Ways to pay</h4>
+      <div class="pay-row">
+        <div class="pay-card"><b>Semester-wise</b><span>Tuition paid twice a year, at the start of each semester.</span></div>
+      </div>
+      <div class="pay-row">
+        <div class="pay-card"><b>Easy installments</b><span>Split semester dues into monthly installments on request.</span></div>
+        <div class="pay-card"><b>Welfare — FREE</b><span>Eligible PWWF welfare workers study completely free.</span></div>
+      </div>
+      <div class="fee-note">
+        <b>Fee structure:</b> exact per-program fees are shared personally by the admissions office,
+        as they are revised each session. WhatsApp <b>0324-3334977</b> for today's schedule.
+      </div>
+    </div>
+  </div>
+
+  <!-- CAMPUS LIFE -->
+  <div class="chapter">
+    <span class="kicker">Campus &amp; Facilities</span>
+    <h2>Where learning comes alive</h2>
+    <p class="body-text">
+      From the first semester, BINC students learn in spaces designed for practice: a pharmacy lab
+      for hands-on dispenser training, a rehabilitation gym for DPT clinical practice, modern
+      computer labs for coding sessions and AI projects, and a quiet library for study and
+      research. Beyond the classrooms, campus life is warm and community-driven —
+      convocation celebrations, society events and mentorship circles that last well beyond
+      graduation.
+    </p>
+  </div>
+  <div class="shots">
+    <figure class="shot"><img src="../images/gallery/pharmacy-lab.png" alt="Pharmacy lab"><figcaption>Pharmacy Lab</figcaption></figure>
+    <figure class="shot"><img src="../images/gallery/dpt-lab.png" alt="Rehabilitation lab"><figcaption>Rehab Lab</figcaption></figure>
+    <figure class="shot"><img src="../images/gallery/cs-lab.png" alt="Computer science lab"><figcaption>CS Lab</figcaption></figure>
+    <figure class="shot"><img src="../images/gallery/library.png" alt="Library"><figcaption>Library</figcaption></figure>
+    <figure class="shot"><img src="../images/gallery/campus.png" alt="Campus building"><figcaption>Our Campus</figcaption></figure>
+    <figure class="shot"><img src="../images/gallery/graduation.png" alt="Convocation"><figcaption>Convocation</figcaption></figure>
+  </div>
+
+  <!-- FAQS -->
+  <div class="chapter">
+    <span class="kicker">Common Questions</span>
+    <h2>Frequently asked</h2>
+  </div>
+  <div class="faq">
+    <div class="q">When do Fall 2026 admissions open and close?</div>
+    <p class="a">Admissions are open now. Seats per program are limited and filled first-come, merit basis — early applicants secure their seats and documents verification comfortably ahead of the session start in September 2026.</p>
+  </div>
+  <div class="faq">
+    <div class="q">Is the admission really free for welfare workers?</div>
+    <p class="a">Yes. Eligible social welfare workers registered under the welfare foundation (PWWF) receive 100% free admission support. WhatsApp 0324-3334977 and the welfare desk will verify your eligibility and handle the rest.</p>
+  </div>
+  <div class="faq">
+    <div class="q">Can I get the fee structure before applying?</div>
+    <p class="a">Absolutely. Submit the inquiry form or WhatsApp 0324-3334977 and the admissions team will share the complete fee schedule, installment options and any welfare support you qualify for.</p>
+  </div>
+  <div class="faq">
+    <div class="q">Where exactly is the campus located?</div>
+    <p class="a">57 Sector A, GECHS Township, near Pindi Stop, Lahore — easily reachable from all parts of the city, with the admissions office open Monday to Saturday, 9:00 AM to 5:00 PM.</p>
+  </div>
+  <div class="faq">
+    <div class="q">Which programs are offered at Bright International College?</div>
+    <p class="a">We currently offer Pharm-D (Doctor of Pharmacy, 5 Years), DPT (Doctor of Physical Therapy, 5 Years) and BSCS (BS Computer Science, 4 Years) — all career-focused degrees with practical training built in.</p>
+  </div>
+  <div class="faq">
+    <div class="q">What documents are required for admission?</div>
+    <p class="a">Your last academic transcripts/certificates (Matric &amp; Intermediate), CNIC or B-Form, and recent passport-size photographs. Originals are verified at the campus before enrollment.</p>
+  </div>
+
+  <!-- CONTACT -->
+  <div class="chapter">
+    <span class="kicker">Get in Touch</span>
+    <h2>Visit us — we reply fast</h2>
+  </div>
+  <div class="contact">
+    <h3>Admissions Office</h3>
+    <div class="rows">
+      <div class="row"><span class="ic">W</span><span><span class="k">WhatsApp &amp; Calls</span><br><span class="v">0324-3334977</span></span></div>
+      <div class="row"><span class="ic">P</span><span><span class="k">Campus Landline</span><br><span class="v">042-35154958</span></span></div>
+      <div class="row"><span class="ic">@</span><span><span class="k">Email</span><br><span class="v">info@binc.edu.pk</span></span></div>
+      <div class="row"><span class="ic">G</span><span><span class="k">Campus Address</span><br><span class="v">57 Sector A, GECHS Township, Lahore</span></span></div>
+    </div>
+    <div class="apply-strip">
+      <span class="t">Apply online in under 2 minutes — Fall 2026</span>
+      <span class="n">www.binc.edu.pk</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================= ENDING ================= -->
+<div class="ending">
+  <div class="deco-layer">
+    <div class="deco-ring ring-a"></div>
+    <div class="deco-ring ring-b"></div>
+  </div>
+  <div class="big"><span class="line">Build a</span><span class="line gold">Brighter</span><span class="line">Future.</span></div>
+  <p class="sub">
+    Seats for Fall 2026 are limited and filling on a first-come, merit basis.
+    Apply today — or send this prospectus to a friend who needs their next step.
+  </p>
+  <div class="contacts">
+    <div><div class="k">Apply Online</div><div class="v">www.binc.edu.pk</div></div>
+    <div><div class="k">WhatsApp</div><div class="v">0324-3334977</div></div>
+    <div><div class="k">Call</div><div class="v">042-35154958</div></div>
+    <div><div class="k">Email</div><div class="v">info@binc.edu.pk</div></div>
+    <div style="grid-column: 1 / -1;"><div class="k">Campus</div><div class="v">57 Sector A, GECHS Township, Near Pindi Stop, Lahore</div></div>
+  </div>
+  <div class="foot">Bright International College · Excellence in Education · Prospectus 2026</div>
+</div>
+
+</body>
+</html>

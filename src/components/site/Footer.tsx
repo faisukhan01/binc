@@ -80,6 +80,17 @@ export function Footer() {
                   </a>
                 </li>
               ))}
+              <li>
+                <a
+                  href="/prospectus/binc-prospectus-2026.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 font-semibold text-gold-400/95 transition-colors hover:text-gold-300"
+                >
+                  <span className="size-1 rounded-full bg-brand-redlight" />
+                  Prospectus 2026 (PDF)
+                </a>
+              </li>
             </ul>
           </nav>
 

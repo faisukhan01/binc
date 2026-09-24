@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -115,6 +115,41 @@ export function Contact() {
     return () => window.removeEventListener("binc:select-program", onSelectProgram);
   }, [setValue]);
 
+  // Draft autosave — restore a partially filled form when the visitor returns
+  const DRAFT_KEY = "binc-form-draft";
+  const draftRestored = useRef(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      const draft = JSON.parse(raw) as Partial<FormValues>;
+      if (draft && ((draft.fullName?.length ?? 0) > 2 || (draft.phone?.length ?? 0) > 5)) {
+        reset({ ...draft, isWelfare: Boolean(draft.isWelfare) });
+        draftRestored.current = true;
+        toast({
+          title: "Draft restored ✍️",
+          description: "We kept your unfinished application — pick up right where you left off.",
+        });
+      }
+    } catch {
+      /* corrupted draft — ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    const subscription = watch((values) => {
+      try {
+        const meaningful = (values.fullName?.length ?? 0) > 2 || (values.phone?.length ?? 0) > 5;
+        if (!meaningful) return;
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(values));
+      } catch {
+        /* storage unavailable — ignore */
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
   async function onSubmit(values: FormValues) {
     try {
       const res = await fetch("/api/admissions", {
@@ -126,6 +161,11 @@ export function Contact() {
       if (!res.ok) throw new Error(data?.error || "Something went wrong");
       setSuccess({ trackingCode: data.trackingCode });
       reset();
+      try {
+        localStorage.removeItem("binc-form-draft");
+      } catch {
+        /* ignore */
+      }
       toast({
         title: "Application submitted 🎉",
         description: `Your tracking code is ${data.trackingCode}`,

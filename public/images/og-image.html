@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { width: 1200px; height: 630px; overflow: hidden; font-family: Arial, Helvetica, sans-serif; }
+.stage {
+  width: 1200px; height: 630px; position: relative;
+  background: linear-gradient(135deg, #0a2456 0%, #071d49 55%, #050f2b 100%);
+  color: #fff; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 70px;
+}
+.ring { position: absolute; border-radius: 50%; border: 2px solid rgba(217,166,46,.35); }
+.r1 { width: 420px; height: 420px; top: -160px; right: -120px; }
+.r2 { width: 260px; height: 260px; bottom: -100px; left: -80px; border-color: rgba(199,25,32,.3); }
+.grain {
+  position: absolute; inset: 0; opacity: .06;
+  background-image: repeating-linear-gradient(-45deg, transparent 0 30px, #fff 30px 31px);
+}
+.left { position: relative; max-width: 660px; }
+.kicker {
+  display: inline-block; background: linear-gradient(90deg, #d9a62e, #e8bd55); color: #071d49;
+  font-size: 22px; font-weight: 900; letter-spacing: .18em; padding: 10px 24px; border-radius: 999px;
+  text-transform: uppercase;
+}
+h1 { font-family: Georgia, 'Times New Roman', serif; font-size: 78px; line-height: 1.04; font-weight: 900; margin-top: 26px; }
+h1 .gold { color: #e8bd55; }
+.tagline { margin-top: 20px; font-size: 27px; color: rgba(255,255,255,.85); font-weight: 500; }
+.chips { display: flex; gap: 14px; margin-top: 30px; flex-wrap: wrap; }
+.chip {
+  border: 1.5px solid rgba(255,255,255,.3); background: rgba(255,255,255,.08);
+  padding: 12px 26px; border-radius: 999px; font-size: 21px; font-weight: 800;
+}
+.chip b { color: #e8bd55; }
+.welfare {
+  margin-top: 30px; display: inline-flex; align-items: center; gap: 12px;
+  background: rgba(18,99,59,.55); border: 1.5px solid rgba(84,178,127,.55);
+  padding: 12px 22px; border-radius: 14px; font-size: 21px; font-weight: 700;
+}
+.welfare .dot { width: 12px; height: 12px; border-radius: 50%; background: #3fbf78; }
+.right { position: relative; flex-shrink: 0; }
+.crest {
+  width: 300px; height: 300px; border-radius: 50%; background: #fff;
+  overflow: hidden; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 14px rgba(217,166,46,.28), 0 30px 70px rgba(0,0,0,.5);
+}
+.crest img { width: 218px; height: 218px; object-fit: contain; }
+.contact { text-align: center; margin-top: 26px; font-size: 20px; color: rgba(255,255,255,.8); font-weight: 600; letter-spacing: .04em; }
+.strip {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 12px;
+  background: linear-gradient(90deg, #c71920, #d9a62e, #c71920);
+}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="ring r1"></div>
+  <div class="ring r2"></div>
+  <div class="grain"></div>
+  <div class="left">
+    <span class="kicker">Admissions Open · Fall 2026</span>
+    <h1>Bright International<br><span class="gold">College</span></h1>
+    <p class="tagline">Excellence in Education — Lahore</p>
+    <div class="chips">
+      <span class="chip"><b>Pharm-D</b> · 5Y</span>
+      <span class="chip"><b>DPT</b> · 5Y</span>
+      <span class="chip"><b>BSCS</b> · 4Y</span>
+    </div>
+    <div class="welfare"><span class="dot"></span>100% admission free for eligible welfare workers</div>
+  </div>
+  <div class="right">
+    <div class="crest"><img src="../images/logo.jpg" alt="BINC"></div>
+    <div class="contact">www.binc.edu.pk · 0324-3334977</div>
+  </div>
+  <div class="strip"></div>
+</div>
+</body>
+</html>

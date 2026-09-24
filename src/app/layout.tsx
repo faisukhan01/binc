@@ -38,13 +38,22 @@ export const metadata: Metadata = {
     url: "https://www.binc.edu.pk",
     siteName: "Bright International College",
     type: "website",
-    images: [{ url: "/images/logo.jpg", width: 447, height: 447 }],
+    locale: "en_PK",
+    images: [
+      {
+        url: "/images/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Bright International College — Admissions Open Fall 2026, Lahore. Pharm-D, DPT & BSCS.",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Bright International College — Admissions Open Fall 2026",
     description:
       "Pharm-D · DPT · BSCS — Excellence in Education, Lahore. Apply online now.",
+    images: ["/images/og-image.jpg"],
   },
 };
 
