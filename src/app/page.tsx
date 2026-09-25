@@ -5,13 +5,10 @@ import { About } from "@/components/site/About";
 import { Announcements } from "@/components/site/Announcements";
 import { Programs } from "@/components/site/Programs";
 import { Welfare } from "@/components/site/Welfare";
-import { Fees } from "@/components/site/Fees";
+import { Admissions } from "@/components/site/Admissions";
 import { CampusLife } from "@/components/site/CampusLife";
-import { Gallery } from "@/components/site/Gallery";
-import { Process } from "@/components/site/Process";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Faq } from "@/components/site/Faq";
-import { CtaBanner } from "@/components/site/CtaBanner";
 import { Contact } from "@/components/site/Contact";
 import { Footer } from "@/components/site/Footer";
 import { FloatingWhatsApp } from "@/components/site/FloatingWhatsApp";
@@ -75,13 +72,10 @@ export default function Home() {
         <Announcements />
         <Programs />
         <Welfare />
-        <Fees />
-        <Process />
+        <Admissions />
         <CampusLife />
-        <Gallery />
         <Testimonials />
         <Faq />
-        <CtaBanner />
         <Contact />
       </main>
       <Footer />

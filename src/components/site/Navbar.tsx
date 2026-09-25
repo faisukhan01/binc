@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Menu, Phone, X, Sparkles } from "lucide-react";
+import { Menu, Phone, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { SITE, NAV_LINKS } from "@/lib/site-data";
 import { useT } from "@/lib/lang";
@@ -19,7 +19,7 @@ export function Navbar() {
   const links = isUr ? UR.nav.links : NAV_LINKS;
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -62,28 +62,25 @@ export function Navbar() {
   return (
     <>
       {/* Top utility bar */}
-      <div className="bg-navy-950 text-white/90 text-[11px] sm:text-xs">
-        <div className="mx-auto max-w-7xl px-4 flex items-center justify-between h-9 gap-3">
-          <p className="flex items-center gap-2 min-w-0">
-            <span className="relative flex size-2 shrink-0">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold-400 opacity-75" />
-              <span className="relative inline-flex size-2 rounded-full bg-gold-400" />
+      <div className="bg-navy-950 text-white/85">
+        <div className="mx-auto flex h-10 max-w-7xl items-center justify-between gap-3 px-4 text-[11px] sm:text-xs">
+          <p className="flex min-w-0 items-center gap-2.5">
+            <span className="relative flex size-1.5 shrink-0">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold-400 opacity-70" />
+              <span className="relative inline-flex size-1.5 rounded-full bg-gold-400" />
             </span>
-            <span className="truncate font-medium tracking-wide">
-              {isUr ? UR.topbar : "ADMISSIONS OPEN — FALL 2026 · Limited Seats"}
+            <span className="truncate font-medium uppercase tracking-[0.14em]">
+              {isUr ? UR.topbar : "Admissions Open — Fall 2026 · Limited Seats"}
             </span>
           </p>
-          <div className="hidden md:flex items-center gap-5 shrink-0">
+          <div className="hidden shrink-0 items-center gap-6 md:flex">
             <a
               href={`tel:${SITE.phone}`}
-              className="flex items-center gap-1.5 hover:text-gold-400 transition-colors"
+              className="flex items-center gap-1.5 transition-colors hover:text-gold-400"
             >
-              <Phone className="size-3.5" /> {SITE.phone}
+              <Phone className="size-3.5" /> <span className="rtl-ltr">{SITE.phone}</span>
             </a>
-            <a
-              href={`mailto:${SITE.email}`}
-              className="hover:text-gold-400 transition-colors"
-            >
+            <a href={`mailto:${SITE.email}`} className="transition-colors hover:text-gold-400">
               {SITE.email}
             </a>
           </div>
@@ -93,62 +90,54 @@ export function Navbar() {
       {/* Main navbar */}
       <header
         className={cn(
-          "sticky top-0 z-50 transition-all duration-500",
-          scrolled
-            ? "glass-nav shadow-[0_8px_30px_-10px_rgba(7,29,73,0.28)]"
-            : "bg-white/70 backdrop-blur-sm"
+          "sticky top-0 z-50 border-b bg-white transition-shadow duration-300",
+          scrolled ? "border-border shadow-[0_6px_24px_-16px_rgba(6,13,28,0.35)]" : "border-transparent"
         )}
       >
         <div className="mx-auto max-w-7xl px-4">
           <nav
-            className="flex items-center justify-between gap-3 py-2.5"
+            className="flex items-center justify-between gap-3 py-3"
             aria-label="Main navigation"
           >
             {/* Brand */}
-            <a href="#home" className="flex items-center gap-2.5 group min-w-0">
-              <span className="relative shrink-0">
-                <Image
-                  src="/images/logo.jpg"
-                  alt={`${SITE.name} logo`}
-                  width={54}
-                  height={54}
-                  priority
-                  className="size-11 sm:size-[54px] object-contain rounded-full ring-2 ring-navy-850/10 group-hover:ring-gold-500/60 transition-all duration-500 bg-white"
-                />
-                <span className="absolute -inset-1 rounded-full bg-gradient-to-tr from-gold-400/0 via-gold-400/40 to-brand-red/0 opacity-0 group-hover:opacity-100 blur-md transition-opacity duration-500 -z-10" />
-              </span>
-              <span className="leading-tight min-w-0">
-                <span className="block font-display font-extrabold text-navy-850 text-[15px] sm:text-lg tracking-tight truncate rtl:text-sm sm:rtl:text-base rtl:tracking-normal">
+            <a href="#home" className="flex min-w-0 items-center gap-3">
+              <Image
+                src="/images/logo.jpg"
+                alt={`${SITE.name} logo`}
+                width={52}
+                height={52}
+                priority
+                className="size-11 shrink-0 rounded-full bg-white object-contain sm:size-[52px]"
+              />
+              <span className="min-w-0 leading-tight">
+                <span className="block truncate font-display text-[15px] font-bold tracking-tight text-navy-900 sm:text-lg">
                   BRIGHT <span className="text-brand-red">INTERNATIONAL</span> COLLEGE
                 </span>
-                <span className="block text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.22em] text-gold-600 rtl:tracking-[0.08em]">
+                <span className="block text-[9.5px] font-semibold uppercase tracking-[0.28em] text-gold-600 sm:text-[10.5px]">
                   {isUr ? SITE.taglineUr : "Excellence in Education"}
                 </span>
               </span>
             </a>
 
             {/* Desktop links */}
-            <div className="hidden lg:flex items-center gap-0.5 xl:gap-1">
+            <div className="hidden items-center gap-0.5 lg:flex xl:gap-1.5">
               {links.map((l) => (
                 <a
                   key={l.href}
                   href={l.href}
                   aria-current={l.href === active ? "true" : undefined}
                   className={cn(
-                    "relative rounded-lg px-2 py-2 text-[13px] font-semibold transition-colors group xl:px-2.5 xl:text-sm",
+                    "group relative rounded-md px-2.5 py-2 text-[13.5px] font-semibold transition-colors xl:text-sm",
                     l.href === active
-                      ? "text-navy-950 bg-navy-50"
-                      : "text-navy-850/80 hover:text-navy-950 hover:bg-navy-50/70",
-                    (l.href === "#campus" || l.href === "#gallery") && "hidden xl:block"
+                      ? "text-navy-950"
+                      : "text-navy-800/75 hover:text-navy-950"
                   )}
                 >
                   {l.label}
                   <span
                     className={cn(
-                      "absolute inset-x-2.5 -bottom-px h-0.5 rounded-full bg-gradient-to-r from-brand-red to-gold-500 transition-transform duration-300",
-                      l.href === active
-                        ? "scale-x-100"
-                        : "scale-x-0 group-hover:scale-x-100"
+                      "absolute inset-x-2.5 bottom-0.5 h-[2px] origin-left rounded-full bg-gold-500 transition-transform duration-300",
+                      l.href === active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                     )}
                   />
                 </a>
@@ -159,9 +148,8 @@ export function Navbar() {
               <LangToggle />
               <a
                 href="#apply"
-                className="hidden sm:inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand-red to-brand-redlight px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-brand-red/30 hover:shadow-brand-red/50 hover:-translate-y-0.5 transition-all duration-300 min-h-[44px]"
+                className="hidden min-h-[44px] items-center rounded-lg bg-brand-red px-5 py-2.5 text-sm font-bold text-white transition-colors duration-200 hover:bg-brand-redlight sm:inline-flex"
               >
-                <Sparkles className="size-4" />
                 {isUr ? UR.nav.applyNow : "Apply Now"}
               </a>
               <Button
@@ -169,7 +157,7 @@ export function Navbar() {
                 size="icon"
                 aria-label={isUr ? UR.nav.menuOpen : "Open menu"}
                 onClick={() => setOpen(true)}
-                className="lg:hidden size-11 border-navy-850/20 text-navy-850 hover:bg-navy-50"
+                className="size-11 border-navy-200 text-navy-900 hover:bg-navy-50 lg:hidden"
               >
                 <Menu className="size-5" />
               </Button>
@@ -186,7 +174,7 @@ export function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[60] bg-navy-950/60 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-[60] bg-navy-950/55 backdrop-blur-sm lg:hidden"
               onClick={() => setOpen(false)}
               aria-hidden
             />
@@ -194,13 +182,13 @@ export function Navbar() {
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 28, stiffness: 260 }}
-              className="fixed inset-y-0 right-0 z-[70] w-[85vw] max-w-sm bg-white shadow-2xl flex flex-col lg:hidden"
+              transition={{ type: "spring", damping: 30, stiffness: 280 }}
+              className="fixed inset-y-0 right-0 z-[70] flex w-[85vw] max-w-sm flex-col bg-white shadow-2xl lg:hidden"
               role="dialog"
               aria-modal="true"
               aria-label="Mobile menu"
             >
-              <div className="flex items-center justify-between p-4 border-b border-border">
+              <div className="flex items-center justify-between border-b border-border p-4">
                 <div className="flex items-center gap-2.5">
                   <Image
                     src="/images/logo.jpg"
@@ -209,7 +197,7 @@ export function Navbar() {
                     height={40}
                     className="size-10 rounded-full object-contain"
                   />
-                  <span className="font-display font-extrabold text-navy-850 text-sm">
+                  <span className="font-display text-sm font-bold text-navy-900">
                     Bright International College
                   </span>
                 </div>
@@ -224,47 +212,47 @@ export function Navbar() {
                 </Button>
               </div>
 
-              <nav className="flex-1 overflow-y-auto p-4 flex flex-col gap-1">
+              <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-3">
                 {links.map((l, i) => (
                   <motion.a
                     key={l.href}
                     href={l.href}
                     onClick={() => setOpen(false)}
-                    initial={{ opacity: 0, x: 24 }}
+                    initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.05 + i * 0.05 }}
+                    transition={{ delay: 0.04 + i * 0.04 }}
                     aria-current={l.href === active ? "true" : undefined}
                     className={cn(
-                      "flex items-center justify-between rounded-xl px-4 py-3.5 text-base font-semibold transition-colors",
+                      "flex items-center justify-between rounded-lg px-4 py-3.5 text-base font-semibold transition-colors",
                       l.href === active
                         ? "bg-navy-50 text-navy-950"
-                        : "text-navy-850 hover:bg-navy-50 active:bg-navy-100"
+                        : "text-navy-800 hover:bg-navy-50"
                     )}
                   >
                     {l.label}
                     <span
                       className={cn(
-                        "size-1.5 rounded-full",
-                        l.href === active ? "bg-brand-red" : "bg-gold-500"
+                        "h-[2px] w-5 rounded-full",
+                        l.href === active ? "bg-gold-500" : "bg-navy-100"
                       )}
                     />
                   </motion.a>
                 ))}
               </nav>
 
-              <div className="p-4 border-t border-border space-y-3">
+              <div className="space-y-2.5 border-t border-border p-4">
                 <a
                   href="#apply"
                   onClick={() => setOpen(false)}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-red to-brand-redlight px-5 py-3.5 text-base font-bold text-white min-h-[48px]"
+                  className="flex min-h-[48px] items-center justify-center rounded-lg bg-brand-red px-5 py-3.5 text-base font-bold text-white"
                 >
-                  <Sparkles className="size-5" /> {isUr ? UR.nav.drawerApply : "Apply Now — Fall 2026"}
+                  {isUr ? UR.nav.drawerApply : "Apply Now — Fall 2026"}
                 </a>
                 <a
                   href={`https://wa.me/${SITE.whatsappIntl}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center justify-center rounded-xl bg-welfare-500 px-5 py-3.5 text-base font-bold text-white min-h-[48px]"
+                  className="flex min-h-[48px] items-center justify-center rounded-lg bg-welfare-700 px-5 py-3.5 text-base font-bold text-white"
                 >
                   WhatsApp: {SITE.whatsapp}
                 </a>

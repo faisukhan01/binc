@@ -1,14 +1,14 @@
 "use client";
 
-import { Sparkles, Gift, Hourglass } from "lucide-react";
+import { GraduationCap, Gift, Hourglass } from "lucide-react";
 import { useT } from "@/lib/lang";
 import { UR } from "@/lib/i18n";
 
 const ITEMS = [
-  { icon: Sparkles, text: "Admissions Open — Fall 2026" },
+  { icon: GraduationCap, text: "Admissions Open — Fall 2026" },
   { icon: Gift, text: "100% Admission Free for Welfare Workers" },
   { icon: Hourglass, text: "Limited Seats — Apply Today" },
-  { icon: Sparkles, text: "Pharm-D · DPT · BSCS" },
+  { icon: GraduationCap, text: "Pharm-D · DPT · BSCS" },
 ];
 
 export function MarqueeStrip() {
@@ -18,7 +18,7 @@ export function MarqueeStrip() {
   const loop = [...row, ...row, ...row];
   return (
     <div
-      className="relative z-10 overflow-hidden border-y border-white/10 bg-gradient-to-r from-navy-950 via-navy-800 to-navy-950 py-3.5"
+      className="relative z-10 overflow-hidden bg-navy-950 py-3.5"
       aria-label="Announcements"
     >
       <div className="marquee-track flex w-max animate-marquee items-center gap-10 pr-10">
@@ -27,11 +27,11 @@ export function MarqueeStrip() {
             {loop.map((item, i) => (
               <span
                 key={`${half}-${i}`}
-                className="flex items-center gap-2.5 whitespace-nowrap text-sm font-bold tracking-wide text-white"
+                className="flex items-center gap-2.5 whitespace-nowrap text-[13px] font-semibold uppercase tracking-[0.12em] text-navy-100/90"
               >
                 <item.icon className="size-4 text-gold-400" aria-hidden />
                 {item.text}
-                <span className="ml-6 size-1.5 rounded-full bg-brand-redlight" />
+                <span className="ml-6 size-1 rounded-full bg-gold-500/70" aria-hidden />
               </span>
             ))}
           </div>

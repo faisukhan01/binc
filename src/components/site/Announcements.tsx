@@ -90,7 +90,7 @@ export function Announcements() {
           kicker="Notice Board"
           title={
             <>
-              Latest <span className="text-gradient-navy-red">updates &amp; events</span>
+              Latest <span className="text-brand-red">updates &amp; events</span>
             </>
           }
           subtitle="Announcements from the admissions office — deadlines, events and results, straight from campus."

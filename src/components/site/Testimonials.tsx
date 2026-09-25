@@ -140,7 +140,7 @@ export function Testimonials() {
           kicker="Student Voices"
           title={
             <>
-              Stories from our <span className="text-gradient-navy-red">Bright family</span>
+              Stories from our <span className="text-brand-red">Bright family</span>
             </>
           }
         />
@@ -253,7 +253,7 @@ export function Testimonials() {
                   className={cn(
                     "h-2.5 rounded-full transition-all duration-300",
                     i === activeIndex
-                      ? "w-8 bg-gradient-to-r from-brand-red to-gold-500"
+                      ? "w-8 bg-gold-500"
                       : "w-2.5 bg-navy-200 hover:bg-navy-300"
                   )}
                 />

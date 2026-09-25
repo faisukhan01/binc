@@ -20,7 +20,7 @@ export function ScrollProgress() {
     <motion.div
       aria-hidden
       style={{ scaleX }}
-      className="fixed inset-x-0 top-0 z-[70] h-[3px] origin-left bg-gradient-to-r from-brand-red via-gold-400 to-brand-red"
+      className="fixed inset-x-0 top-0 z-[70] h-[2.5px] origin-left bg-gold-500"
       initial={{ opacity: 0 }}
       animate={{ opacity: visible ? 1 : 0 }}
       transition={{ duration: 0.25 }}

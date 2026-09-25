@@ -23,11 +23,11 @@ export function Faq() {
           title={
             isUr ? (
               <>
-                {UR.faq.titleA} <span className="text-gradient-navy-red">{UR.faq.titleB}</span>
+                {UR.faq.titleA} <span className="text-gold-600">{UR.faq.titleB}</span>
               </>
             ) : (
               <>
-                Questions? <span className="text-gradient-navy-red">Answered.</span>
+                Questions? <span className="text-brand-red">Answered.</span>
               </>
             )
           }
