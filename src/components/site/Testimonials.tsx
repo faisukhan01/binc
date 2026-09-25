@@ -140,7 +140,7 @@ export function Testimonials() {
           kicker="Student Voices"
           title={
             <>
-              Stories from our <span className="text-brand-red">Bright family</span>
+              Stories from our <span className="text-green-700">Bright family</span>
             </>
           }
         />
@@ -223,7 +223,7 @@ export function Testimonials() {
                         </span>
                       )}
                     </span>
-                    <span className="mt-0.5 block text-sm font-semibold text-brand-red">
+                    <span className="mt-0.5 block text-sm font-semibold text-green-700">
                       {item.program}
                     </span>
                   </span>

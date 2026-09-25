@@ -27,7 +27,7 @@ export function Faq() {
               </>
             ) : (
               <>
-                Questions? <span className="text-brand-red">Answered.</span>
+                Questions? <span className="text-green-700">Answered.</span>
               </>
             )
           }
@@ -46,9 +46,9 @@ export function Faq() {
                 value={`faq-${i}`}
                 className="group rounded-2xl border border-border bg-white px-5 shadow-sm transition-all data-[state=open]:border-navy-200 data-[state=open]:shadow-lg data-[state=open]:shadow-navy-900/10 sm:px-6"
               >
-                <AccordionTrigger className="py-4.5 text-start font-bold text-navy-900 hover:no-underline [&[data-state=open]]:text-brand-red [&>svg]:size-5 [&>svg]:text-brand-red">
+                <AccordionTrigger className="py-4.5 text-start font-bold text-navy-900 hover:no-underline data-[state=open]:text-green-700 [&>svg]:size-5 [&>svg]:text-green-700">
                   <span className="flex items-center gap-3.5">
-                    <span className="hidden sm:grid size-9 shrink-0 place-items-center rounded-xl bg-navy-50 text-navy-800 transition-colors group-data-[state=open]:bg-brand-red group-data-[state=open]:text-white">
+                    <span className="hidden sm:grid size-9 shrink-0 place-items-center rounded-xl bg-navy-50 text-navy-800 transition-colors group-data-[state=open]:bg-green-800 group-data-[state=open]:text-white">
                       <MessageCircleQuestion className="size-4.5" />
                     </span>
                     <span className="text-[15px] sm:text-base">{f.q}</span>

@@ -38,11 +38,11 @@ export function Admissions() {
           title={
             isUr ? (
               <>
-                {UR.process.titleA} <span className="text-brand-red">{UR.process.titleB}</span> {UR.process.titleC}
+                {UR.process.titleA} <span className="text-green-700">{UR.process.titleB}</span> {UR.process.titleC}
               </>
             ) : (
               <>
-                Admission in <span className="text-brand-red">4 easy steps</span>
+                Admission in <span className="text-green-700">4 easy steps</span>
               </>
             )
           }

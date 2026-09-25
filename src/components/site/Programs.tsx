@@ -22,11 +22,11 @@ export function Programs() {
           title={
             isUr ? (
               <>
-                {UR.programs.titleA} <span className="text-brand-red">{UR.programs.titleB}</span> {UR.programs.titleC}
+                {UR.programs.titleA} <span className="text-green-700">{UR.programs.titleB}</span> {UR.programs.titleC}
               </>
             ) : (
               <>
-                Choose your <span className="text-brand-red">professional degree</span>
+                Choose your <span className="text-green-700">professional degree</span>
               </>
             )
           }
@@ -57,7 +57,7 @@ export function Programs() {
                   <div className="absolute inset-0 bg-gradient-to-t from-navy-950/55 via-transparent to-transparent" />
                   {/* Duration badge */}
                   <span className="absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-md bg-white/95 px-3 py-1.5 text-xs font-bold text-navy-900 shadow-sm">
-                    <Clock3 className="size-3.5 text-brand-red" />
+                    <Clock3 className="size-3.5 text-gold-600" />
                     {isUr ? UR.programs.durations[p.duration as keyof typeof UR.programs.durations] ?? p.duration : p.duration}
                   </span>
                   {/* Title over photo */}

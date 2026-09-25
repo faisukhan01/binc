@@ -28,7 +28,7 @@ export function MobileCtaBar() {
         </a>
         <a
           href="#apply"
-          className="flex min-h-[58px] flex-col items-center justify-center gap-0.5 bg-gradient-to-b from-brand-red to-brand-redlight py-2 text-white"
+          className="flex min-h-[58px] flex-col items-center justify-center gap-0.5 bg-green-800 py-2 text-white"
         >
           <ClipboardEdit className="size-5" />
           <span className="text-[11px] font-extrabold tracking-wide">{isUr ? UR.mobileBar.apply : "Apply Now"}</span>

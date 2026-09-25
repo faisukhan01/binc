@@ -802,7 +802,7 @@ export function AdminConsole() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-h-[92vh] overflow-y-auto rounded-2xl bg-white p-0 sm:max-w-4xl [&>button]:hidden">
-        <DialogHeader className="space-y-0 rounded-t-2xl bg-gradient-to-r from-navy-950 via-navy-900 to-navy-850 px-6 py-5 text-left">
+        <DialogHeader className="space-y-0 rounded-t-xl bg-navy-950 px-6 py-5 text-left">
           <DialogTitle className="flex items-center gap-3 font-display text-xl font-black text-white">
             <span className="grid size-10 place-items-center rounded-xl bg-gold-400/15 ring-1 ring-gold-400/40">
               <ShieldCheck className="size-5 text-gold-400" />
@@ -866,7 +866,7 @@ export function AdminConsole() {
               <Button
                 type="submit"
                 disabled={loading || !adminKey}
-                className="mt-4 h-12 w-full rounded-xl bg-gradient-to-r from-navy-900 to-navy-800 text-sm font-extrabold text-white shadow-lg hover:shadow-xl"
+                className="mt-4 h-12 w-full rounded-lg bg-navy-950 text-sm font-bold text-white transition-colors hover:bg-navy-800"
               >
                 {loading ? (
                   <>
@@ -928,7 +928,7 @@ export function AdminConsole() {
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
-                  className="mb-3 flex items-center justify-between gap-3 rounded-xl border border-gold-400/50 bg-gradient-to-r from-gold-400/15 to-transparent px-4 py-3"
+                  className="mb-3 flex items-center justify-between gap-3 rounded-xl border border-gold-400/50 bg-gold-400/10 px-4 py-3"
                 >
                   <p className="min-w-0 truncate text-xs font-extrabold text-navy-900">
                     <span className="mr-2 inline-flex items-center rounded-full bg-brand-red px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
@@ -997,7 +997,7 @@ export function AdminConsole() {
                             initial={{ width: 0 }}
                             animate={{ width: `${Math.max(pct, 6)}%` }}
                             transition={{ type: "spring", damping: 22, stiffness: 160 }}
-                            className="h-full rounded-full bg-gradient-to-r from-navy-800 via-navy-700 to-brand-red"
+                            className="h-full rounded-full bg-green-700"
                           />
                         </div>
                         <span className="w-14 shrink-0 text-right text-xs font-bold text-muted-foreground">
@@ -1071,8 +1071,8 @@ export function AdminConsole() {
                           "w-full max-w-[22px] rounded-t-md transition-colors",
                           d.count > 0
                             ? i === trendDays.length - 1
-                              ? "bg-gradient-to-t from-brand-red to-gold-400"
-                              : "bg-gradient-to-t from-navy-800 to-navy-500 group-hover:from-brand-red group-hover:to-gold-400"
+                              ? "bg-gold-400"
+                              : "bg-navy-800 group-hover:bg-gold-400"
                             : "bg-navy-100"
                         )}
                       />
@@ -1434,8 +1434,8 @@ export function AdminConsole() {
                         className={cn(
                           "mt-4 ml-auto min-h-[40px] rounded-xl px-5 text-sm font-extrabold text-white shadow-lg hover:shadow-xl disabled:opacity-60",
                           annEditingId
-                            ? "bg-gradient-to-r from-gold-500 to-gold-600 !text-navy-950"
-                            : "bg-gradient-to-r from-navy-900 to-navy-800"
+                            ? "bg-gold-500 !text-navy-950"
+                            : "bg-navy-900"
                         )}
                       >
                         {annSaving ? (
@@ -1658,8 +1658,8 @@ export function AdminConsole() {
                         className={cn(
                           "ml-auto min-h-[40px] rounded-xl px-5 text-sm font-extrabold text-white shadow-lg hover:shadow-xl disabled:opacity-60",
                           tstEditingId
-                            ? "bg-gradient-to-r from-gold-500 to-gold-600 !text-navy-950"
-                            : "bg-gradient-to-r from-navy-900 to-navy-800"
+                            ? "bg-gold-500 !text-navy-950"
+                            : "bg-navy-900"
                         )}
                       >
                         {tstSaving ? (
@@ -1741,7 +1741,7 @@ export function AdminConsole() {
                           >
                             <span
                               aria-hidden
-                              className="grid size-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-navy-700 to-navy-950 text-xs font-black text-white"
+                              className="grid size-10 shrink-0 place-items-center rounded-full bg-navy-800 text-xs font-bold text-white"
                             >
                               {t.name.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("")}
                             </span>
@@ -1821,7 +1821,7 @@ export function AdminConsole() {
                     <Button
                       onClick={() => void saveDeadline(deadline)}
                       disabled={deadlineSaving || !deadline}
-                      className="h-10 rounded-xl bg-gradient-to-r from-navy-900 to-navy-800 px-5 text-sm font-extrabold text-white shadow-lg hover:shadow-xl disabled:opacity-60"
+                      className="h-10 rounded-xl bg-navy-900 px-5 text-sm font-extrabold text-white shadow-lg hover:shadow-xl disabled:opacity-60"
                     >
                       {deadlineSaving ? (
                         <>
@@ -1948,7 +1948,7 @@ export function AdminConsole() {
                       <Button
                         onClick={() => void savePopup()}
                         disabled={popupSaving}
-                        className="min-h-[40px] rounded-xl bg-gradient-to-r from-navy-900 to-navy-800 px-5 text-sm font-extrabold text-white shadow-lg hover:shadow-xl disabled:opacity-60"
+                        className="min-h-[40px] rounded-xl bg-navy-900 px-5 text-sm font-extrabold text-white shadow-lg hover:shadow-xl disabled:opacity-60"
                       >
                         {popupSaving ? (
                           <>

@@ -99,24 +99,16 @@ export function Navbar() {
             className="flex items-center justify-between gap-3 py-3"
             aria-label="Main navigation"
           >
-            {/* Brand */}
-            <a href="#home" className="flex min-w-0 items-center gap-3">
+            {/* Brand — logo only, original mark, larger */}
+            <a href="#home" className="flex min-w-0 items-center" aria-label="Bright International College — home">
               <Image
                 src="/images/logo.jpg"
                 alt={`${SITE.name} logo`}
-                width={52}
-                height={52}
+                width={220}
+                height={88}
                 priority
-                className="size-11 shrink-0 rounded-full bg-white object-contain sm:size-[52px]"
+                className="h-16 w-auto object-contain sm:h-20"
               />
-              <span className="min-w-0 leading-tight">
-                <span className="block truncate font-display text-[15px] font-bold tracking-tight text-navy-900 sm:text-lg">
-                  BRIGHT <span className="text-brand-red">INTERNATIONAL</span> COLLEGE
-                </span>
-                <span className="block text-[9.5px] font-semibold uppercase tracking-[0.28em] text-gold-600 sm:text-[10.5px]">
-                  {isUr ? SITE.taglineUr : "Excellence in Education"}
-                </span>
-              </span>
             </a>
 
             {/* Desktop links */}
@@ -148,7 +140,7 @@ export function Navbar() {
               <LangToggle />
               <a
                 href="#apply"
-                className="hidden min-h-[44px] items-center rounded-lg bg-brand-red px-5 py-2.5 text-sm font-bold text-white transition-colors duration-200 hover:bg-brand-redlight sm:inline-flex"
+                className="hidden min-h-[44px] items-center rounded-lg bg-green-800 px-5 py-2.5 text-sm font-bold text-white transition-colors duration-200 hover:bg-green-700 sm:inline-flex"
               >
                 {isUr ? UR.nav.applyNow : "Apply Now"}
               </a>
@@ -189,18 +181,13 @@ export function Navbar() {
               aria-label="Mobile menu"
             >
               <div className="flex items-center justify-between border-b border-border p-4">
-                <div className="flex items-center gap-2.5">
-                  <Image
-                    src="/images/logo.jpg"
-                    alt="BINC logo"
-                    width={40}
-                    height={40}
-                    className="size-10 rounded-full object-contain"
-                  />
-                  <span className="font-display text-sm font-bold text-navy-900">
-                    Bright International College
-                  </span>
-                </div>
+                <Image
+                  src="/images/logo.jpg"
+                  alt="Bright International College logo"
+                  width={180}
+                  height={72}
+                  className="h-11 w-auto object-contain"
+                />
                 <Button
                   variant="ghost"
                   size="icon"
@@ -244,7 +231,7 @@ export function Navbar() {
                 <a
                   href="#apply"
                   onClick={() => setOpen(false)}
-                  className="flex min-h-[48px] items-center justify-center rounded-lg bg-brand-red px-5 py-3.5 text-base font-bold text-white"
+                  className="flex min-h-[48px] items-center justify-center rounded-lg bg-green-800 px-5 py-3.5 text-base font-bold text-white"
                 >
                   {isUr ? UR.nav.drawerApply : "Apply Now — Fall 2026"}
                 </a>

@@ -228,7 +228,7 @@ export function Contact() {
                       rel="noreferrer"
                       className="group flex items-start gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 transition-all hover:border-gold-400/40 hover:bg-white/10"
                     >
-                      <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-gold-400 to-gold-600 text-navy-950 shadow-md">
+                      <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-gold-500 text-green-950">
                         <line.icon className="size-5" />
                       </span>
                       <span className="min-w-0">
@@ -276,7 +276,7 @@ export function Contact() {
                 href={`https://wa.me/${SITE.whatsappIntl}`}
                 target="_blank"
                 rel="noreferrer"
-                className="group flex items-center justify-between rounded-3xl bg-gradient-to-r from-welfare-500 to-welfare-700 p-6 shadow-xl shadow-welfare-500/25 transition-transform hover:-translate-y-1"
+                className="group flex items-center justify-between rounded-2xl bg-welfare-700 p-6 transition-colors hover:bg-welfare-500"
               >
                 <div>
                   <p className="font-display text-xl font-black text-white">
@@ -301,7 +301,7 @@ export function Contact() {
               id="apply"
               className="relative overflow-hidden rounded-3xl border border-border bg-white p-6 shadow-2xl shadow-navy-900/10 sm:p-8"
             >
-              <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-brand-red via-gold-400 to-navy-800" />
+              <div className="absolute inset-x-0 top-0 h-1.5 bg-gold-500" />
 
               {success ? (
                 <motion.div
@@ -377,7 +377,7 @@ export function Contact() {
                         Fall 2026 · takes less than 2 minutes
                       </p>
                     </div>
-                    <span className="hidden sm:inline-flex items-center rounded-full bg-brand-red/10 px-3.5 py-1.5 text-xs font-extrabold uppercase tracking-wider text-brand-red">
+                    <span className="hidden sm:inline-flex items-center rounded-full bg-green-800/10 px-3.5 py-1.5 text-xs font-extrabold uppercase tracking-wider text-green-700">
                       Open Now
                     </span>
                   </div>
@@ -474,7 +474,7 @@ export function Contact() {
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="sm:col-span-2 min-h-[54px] rounded-2xl bg-gradient-to-r from-brand-red to-brand-redlight text-base font-extrabold shadow-lg shadow-brand-red/30 transition-all hover:-translate-y-0.5 hover:shadow-xl disabled:opacity-70"
+                      className="sm:col-span-2 min-h-[54px] rounded-lg bg-green-800 text-base font-bold transition-colors hover:bg-green-700 disabled:opacity-70"
                     >
                       {isSubmitting ? (
                         <>
@@ -509,7 +509,7 @@ export function Contact() {
 function QuickHelp() {
   return (
     <Reveal delay={0.12}>
-      <div className="relative flex h-full flex-col overflow-hidden rounded-3xl bg-gradient-to-br from-navy-900 via-navy-850 to-navy-800 p-6 sm:p-8">
+      <div className="relative flex h-full flex-col overflow-hidden rounded-xl bg-navy-950 p-6 sm:p-8">
         <div
           className="absolute inset-0 opacity-[0.08]"
           style={{

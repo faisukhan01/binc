@@ -79,10 +79,10 @@ export function About() {
               />
               <div className="relative overflow-hidden rounded-lg shadow-2xl shadow-navy-900/20">
                 <Image
-                  src="/images/real/campus-building.jpg"
-                  alt="Bright International College campus — modern academic building"
+                  src="/images/real/pk-campus.jpg"
+                  alt="Punjab University clock tower, Lahore — Pakistani university heritage"
                   width={2000}
-                  height={1333}
+                  height={1500}
                   className="aspect-[4/3] w-full object-cover"
                 />
               </div>
@@ -90,7 +90,7 @@ export function About() {
               {/* Single quiet badge */}
               <div className="absolute -bottom-6 right-4 rounded-lg border border-border bg-white px-5 py-3.5 shadow-xl shadow-navy-900/15 sm:right-8">
                 <p className="font-display text-xl font-semibold leading-none text-navy-900">
-                  100% <span className="text-brand-red">{isUr ? UR.about.badgeFree : "Free"}</span>
+                  100% <span className="text-green-700">{isUr ? UR.about.badgeFree : "Free"}</span>
                 </p>
                 <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
                   {isUr ? UR.about.badgeWelfare : "Welfare Worker Admissions"}
@@ -107,11 +107,11 @@ export function About() {
               title={
                 isUr ? (
                   <>
-                    {UR.about.titleA} <span className="text-brand-red">{UR.about.titleB}</span>
+                    {UR.about.titleA} <span className="text-green-700">{UR.about.titleB}</span>
                   </>
                 ) : (
                   <>
-                    Where ambition meets <span className="text-brand-red">opportunity</span>
+                    Where ambition meets <span className="text-green-700">opportunity</span>
                   </>
                 )
               }
@@ -163,7 +163,7 @@ export function About() {
 
             <Reveal delay={0.2}>
               <p className="mt-6 flex items-center gap-2.5 text-sm font-semibold text-navy-900">
-                <HeartHandshake className="size-5 text-brand-red" />
+                <HeartHandshake className="size-5 text-green-700" />
                 {isUr ? UR.about.welfareLine : "Proudly serving education under the welfare foundation (PWWF)."}
               </p>
             </Reveal>

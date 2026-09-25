@@ -159,7 +159,7 @@ export function ProgramModal({ program, onClose }: Props) {
                       transition={{ delay: 0.24 + i * 0.06 }}
                       className="relative pb-3.5 last:pb-0"
                     >
-                      <span className="absolute -left-[27px] top-0.5 grid size-5 place-items-center rounded-full bg-gradient-to-br from-brand-red to-brand-redlight ring-4 ring-white">
+                      <span className="absolute -left-[27px] top-0.5 grid size-5 place-items-center rounded-full bg-green-700 ring-4 ring-white">
                         <span className="size-1.5 rounded-full bg-white" />
                       </span>
                       <p className="text-xs font-extrabold uppercase tracking-wider text-brand-red">
@@ -201,7 +201,7 @@ export function ProgramModal({ program, onClose }: Props) {
               >
                 <button
                   onClick={() => applyToProgram(program)}
-                  className="group inline-flex min-h-[52px] items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-brand-red to-brand-redlight px-6 py-3.5 text-base font-extrabold text-white shadow-lg shadow-brand-red/35 transition-all hover:-translate-y-0.5 hover:shadow-xl"
+                  className="group inline-flex min-h-[52px] items-center justify-center gap-2 rounded-lg bg-green-800 px-6 py-3.5 text-base font-bold text-white transition-colors hover:bg-green-700"
                 >
                   Apply for {program.title}
                   <ChevronRight className="size-5 transition-transform duration-300 group-hover:translate-x-1" />
@@ -220,7 +220,7 @@ export function ProgramModal({ program, onClose }: Props) {
             </div>
 
             {/* Top accent */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-brand-red via-gold-400 to-brand-red" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gold-500" />
           </motion.div>
         </motion.div>
       )}

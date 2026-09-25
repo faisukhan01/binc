@@ -50,7 +50,7 @@ export function SectionHeading({
         className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.25em] ${
           dark
             ? "bg-white/10 text-gold-400 border border-white/15"
-            : "bg-navy-50 text-brand-red border border-navy-100"
+            : "bg-navy-50 text-green-700 border border-navy-100"
         }`}
       >
         <span className="size-1.5 rounded-full bg-current" />

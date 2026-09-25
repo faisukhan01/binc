@@ -72,7 +72,7 @@ export function Hero() {
 
             {/* Headline */}
             <h1
-              className={`font-display text-white ${isUr ? "text-[11.5vw] leading-[1.6] sm:text-6xl md:text-7xl lg:text-[5rem]" : "text-[13vw] leading-[1.04] sm:text-6xl md:text-7xl lg:text-[5.2rem]"} font-medium`}
+              className={`font-display text-white ${isUr ? "text-[11.5vw] leading-[1.6] sm:text-6xl md:text-7xl lg:text-[5rem]" : "text-[13.5vw] leading-[1.02] sm:text-6xl md:text-7xl lg:text-[5.8rem]"} font-semibold`}
             >
               {headline.map((word, i) => (
                 <span key={word} className={`inline-block overflow-hidden align-bottom ${isUr ? "pb-4" : "pb-1"}`}>
@@ -125,7 +125,7 @@ export function Hero() {
             >
               <a
                 href="#apply"
-                className="inline-flex min-h-[52px] items-center gap-2.5 rounded-lg bg-brand-red px-8 py-3.5 text-base font-bold text-white transition-colors duration-200 hover:bg-brand-redlight"
+                className="inline-flex min-h-[52px] items-center gap-2.5 rounded-lg bg-gold-500 px-8 py-3.5 text-base font-bold text-green-950 transition-colors duration-200 hover:bg-gold-400"
               >
                 {isUr ? UR.hero.apply : "Apply Online Now"}
                 <span aria-hidden className="rtl-mirror">→</span>

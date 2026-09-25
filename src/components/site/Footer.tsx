@@ -24,9 +24,9 @@ export function Footer() {
               <Image
                 src="/images/logo.jpg"
                 alt="Bright International College logo"
-                width={56}
-                height={56}
-                className="size-14 rounded-full bg-white object-contain"
+                width={220}
+                height={88}
+                className="h-16 w-auto rounded-md bg-white object-contain px-2 py-1.5"
               />
               <div className="leading-tight">
                 <p className="font-display text-lg font-semibold text-white">
@@ -140,7 +140,7 @@ export function Footer() {
             </ul>
             <a
               href="#apply"
-              className="mt-5 inline-flex min-h-[46px] items-center rounded-lg bg-brand-red px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-brand-redlight"
+              className="mt-5 inline-flex min-h-[46px] items-center rounded-lg bg-green-800 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-green-700"
             >
               {isUr ? UR.footer.applyNow : "Apply Now — Fall 2026"}
             </a>

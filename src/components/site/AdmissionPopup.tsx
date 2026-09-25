@@ -90,9 +90,9 @@ export function AdmissionPopup() {
               <Image
                 src="/images/logo.jpg"
                 alt=""
-                width={64}
-                height={64}
-                className="mx-auto mb-4 size-16 rounded-full bg-white object-contain ring-1 ring-gold-500/50"
+                width={180}
+                height={72}
+                className="mx-auto mb-4 h-16 w-auto rounded-lg bg-white object-contain px-2.5 py-2 ring-1 ring-gold-500/50"
               />
               <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-gold-400">
                 {isUr ? UR.popup.kicker : "Bright International College"}
@@ -147,7 +147,7 @@ export function AdmissionPopup() {
                 <a
                   href="#apply"
                   onClick={() => setOpen(false)}
-                  className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-lg bg-brand-red px-6 py-3.5 text-base font-bold text-white transition-colors hover:bg-brand-redlight"
+                  className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-lg bg-green-800 px-6 py-3.5 text-base font-bold text-white transition-colors hover:bg-green-700"
                 >
                   {isUr ? UR.popup.apply : "Apply Online Now"}
                   <span aria-hidden className="rtl-mirror">→</span>

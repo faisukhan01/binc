@@ -5,20 +5,35 @@
 
 @theme {
   /* Brand — Bright International College
-     Refined academic palette: deep ink navy, heritage crimson, antique gold. */
-  --color-navy-950: #060d1c;
-  --color-navy-900: #0a1526;
-  --color-navy-850: #0d1b31;
-  --color-navy-800: #11223d;
-  --color-navy-700: #16294a;
-  --color-navy-600: #1d3560;
-  --color-navy-500: #274a80;
-  --color-navy-400: #5a759f;
-  --color-navy-300: #8fa3c2;
-  --color-navy-200: #c3cfe0;
-  --color-navy-100: #dee6f0;
-  --color-navy-50: #f2f5f9;
+     Pakistani identity: deep Pakistan green, antique gold, ivory.
+     `navy-*` tokens are kept as aliases of the green scale for older classes. */
+  --color-green-950: #032117;
+  --color-green-900: #05301f;
+  --color-green-850: #073b26;
+  --color-green-800: #094a30;
+  --color-green-700: #0c5d3d;
+  --color-green-600: #11744c;
+  --color-green-500: #158057;
+  --color-green-400: #4fa37f;
+  --color-green-300: #7fbfa2;
+  --color-green-200: #b4d9c8;
+  --color-green-100: #dceae3;
+  --color-green-50: #eff6f2;
 
+  --color-navy-950: var(--color-green-950);
+  --color-navy-900: var(--color-green-900);
+  --color-navy-850: var(--color-green-850);
+  --color-navy-800: var(--color-green-800);
+  --color-navy-700: var(--color-green-700);
+  --color-navy-600: var(--color-green-600);
+  --color-navy-500: var(--color-green-500);
+  --color-navy-400: var(--color-green-400);
+  --color-navy-300: var(--color-green-300);
+  --color-navy-200: var(--color-green-200);
+  --color-navy-100: var(--color-green-100);
+  --color-navy-50: var(--color-green-50);
+
+  /* Heritage crimson — used sparingly (warning chips, tiny accents) */
   --color-brand-red: #c71920;
   --color-brand-redlight: #e0202d;
 
@@ -27,12 +42,12 @@
   --color-gold-400: #e0c168;
   --color-gold-300: #eedca0;
 
-  /* Kept for semantic WhatsApp / welfare-verification accents only */
+  /* WhatsApp green (semantic only) */
   --color-welfare-900: #07331f;
   --color-welfare-700: #0a5c37;
-  --color-welfare-500: #0f9d58;
   --color-welfare-600: #0b7a45;
   --color-welfare-800: #094a2c;
+  --color-welfare-500: #0f9d58;
 
   /* Motion — restrained, academic */
   --animate-marquee: marquee 36s linear infinite;
@@ -50,9 +65,9 @@
 }
 
 @theme inline {
-  /* Fonts resolved at usage site (next/font vars live on <html>/<body>) */
-  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-playfair), ui-serif, Georgia, serif;
+  /* Fonts — Cormorant Garamond (display) + Figtree (body) + Gulzar/Amiri (Urdu) */
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-cormorant), ui-serif, Georgia, serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -81,23 +96,23 @@
 :root {
   --radius: 0.625rem;
   --background: #fbfaf8;
-  --foreground: #14202f;
+  --foreground: #16211d;
   --card: #ffffff;
-  --card-foreground: #14202f;
+  --card-foreground: #16211d;
   --popover: #ffffff;
-  --popover-foreground: #14202f;
-  --primary: #0d1b31;
+  --popover-foreground: #16211d;
+  --primary: #094a30;
   --primary-foreground: #ffffff;
-  --secondary: #f2f5f9;
-  --secondary-foreground: #0d1b31;
-  --muted: #f4f3f0;
-  --muted-foreground: #5c6470;
-  --accent: #f2f5f9;
-  --accent-foreground: #0d1b31;
+  --secondary: #eff6f2;
+  --secondary-foreground: #05301f;
+  --muted: #f4f3ef;
+  --muted-foreground: #5b6a62;
+  --accent: #eff6f2;
+  --accent-foreground: #05301f;
   --destructive: #c71920;
-  --border: #e8e6e0;
-  --input: #d6d3cb;
-  --ring: #1d3560;
+  --border: #e6e6de;
+  --input: #d2d6cf;
+  --ring: #0c5d3d;
 }
 
 @layer base {
@@ -112,10 +127,10 @@
   }
   ::selection {
     background: #e0c168;
-    color: #060d1c;
+    color: #032117;
   }
   h1, h2, h3 {
-    letter-spacing: -0.01em;
+    letter-spacing: -0.005em;
   }
 }
 
@@ -125,15 +140,15 @@
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f2f5f9;
+  background: #eff6f2;
 }
 ::-webkit-scrollbar-thumb {
-  background: #16294a;
+  background: #0c5d3d;
   border-radius: 8px;
-  border: 2px solid #f2f5f9;
+  border: 2px solid #eff6f2;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #274a80;
+  background: #11744c;
 }
 
 /* Scroll-margin for anchored sections (sticky header offset) */
@@ -147,7 +162,7 @@ section[id] {
 }
 
 @utility text-gradient-navy-red {
-  color: #0d1b31;
+  color: #094a30;
 }
 
 @utility glass-nav {
@@ -157,17 +172,9 @@ section[id] {
 }
 
 @utility glass-dark {
-  background: rgba(6, 13, 28, 0.55);
+  background: rgba(3, 33, 23, 0.55);
   backdrop-filter: blur(12px) saturate(1.2);
   -webkit-backdrop-filter: blur(12px) saturate(1.2);
-}
-
-/* Hairline gold rule used under section headings */
-@utility gold-rule {
-  position: relative;
-}
-@utility gold-rule-center {
-  position: relative;
 }
 
 /* Pause marquee on hover */
@@ -216,13 +223,13 @@ section[id] {
 }
 
 /* ==================== Urdu / RTL support ==================== */
-/* Body text: Noto Naskh Arabic (readable at small sizes) */
+/* Body text: Amiri (elegant naskh, readable at small sizes) */
 html[dir="rtl"] body {
-  font-family: var(--font-naskh), var(--font-outfit), ui-sans-serif, sans-serif;
+  font-family: var(--font-amiri), var(--font-figtree), ui-sans-serif, sans-serif;
 }
-/* Headings: Noto Nastaliq Urdu (calligraphic) — needs generous line-height */
+/* Headings: Gulzar (Nastaliq calligraphic) — needs generous line-height */
 html[dir="rtl"] .font-display {
-  font-family: var(--font-nastaliq), var(--font-playfair), serif;
+  font-family: var(--font-gulzar), var(--font-cormorant), serif;
   line-height: 1.9;
   letter-spacing: normal;
 }
@@ -231,9 +238,9 @@ html[dir="rtl"] h1, html[dir="rtl"] h2, html[dir="rtl"] h3 {
 }
 /* Latin brand words (BINC, Pharm-D…) keep a latin face inside Urdu text */
 html[dir="rtl"] .font-mono {
-  font-family: var(--font-outfit), monospace;
+  font-family: var(--font-figtree), monospace;
 }
-/* Wide tracking classes ruin Nastaliq/Naskh rhythm — neutralize in RTL */
+/* Wide tracking classes ruin Nastaliq/Amiri rhythm — neutralize in RTL */
 html[dir="rtl"] [class*="tracking-"] {
   letter-spacing: normal !important;
 }

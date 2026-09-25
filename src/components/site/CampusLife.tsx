@@ -18,11 +18,11 @@ export function CampusLife() {
           title={
             isUr ? (
               <>
-                {UR.campus.titleA} <span className="text-brand-red">{UR.campus.titleB}</span>
+                {UR.campus.titleA} <span className="text-green-700">{UR.campus.titleB}</span>
               </>
             ) : (
               <>
-                Life at <span className="text-brand-red">Bright</span>
+                Life at <span className="text-green-700">Bright</span>
               </>
             )
           }
@@ -45,6 +45,34 @@ export function CampusLife() {
               )
             )}
           </ul>
+        </Reveal>
+
+        {/* Campus film banner — Pakistani courtyard b-roll */}
+        <Reveal>
+          <div className="relative mb-10 overflow-hidden rounded-xl shadow-xl shadow-navy-900/15">
+            <video
+              className="aspect-[21/9] w-full object-cover sm:aspect-[16/7]"
+              src="/videos/campus-life.mp4"
+              poster="/images/real/pk-campus.jpg"
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              aria-label="Film of campus life at Bright International College, Lahore"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-green-950/85 via-green-950/20 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7">
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold-400 sm:text-[11px]">
+                {isUr ? UR.campus.kicker : "Campus Life"}
+              </p>
+              <p className="mt-1.5 max-w-xl font-display text-xl font-semibold leading-snug text-white sm:text-2xl">
+                {isUr
+                  ? UR.campus.subtitle
+                  : "Learning beyond the classroom — arches, green lawns and a family that grows together."}
+              </p>
+            </div>
+          </div>
         </Reveal>
 
         {/* Photo grid — real campus photography */}
@@ -75,11 +103,11 @@ export function CampusLife() {
         {/* Visit note */}
         <Reveal delay={0.15}>
           <p className="mt-10 flex flex-wrap items-center justify-center gap-2 text-center text-sm font-semibold text-navy-800">
-            <MapPin className="size-4.5 text-brand-red" />
+            <MapPin className="size-4.5 text-green-700" />
             {isUr ? UR.campus.addressNote : SITE.address}
             <a
               href="#contact"
-              className="ml-2 underline decoration-gold-500 decoration-2 underline-offset-4 transition-colors hover:text-brand-red"
+              className="ml-2 underline decoration-gold-500 decoration-2 underline-offset-4 transition-colors hover:text-green-700"
             >
               {isUr ? UR.campus.visit : "Plan your visit"}
             </a>

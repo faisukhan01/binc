@@ -80,10 +80,10 @@ export function StatusTracker() {
   return (
     <Reveal delay={0.05}>
       <div className="relative overflow-hidden rounded-3xl border border-border bg-white p-6 shadow-xl shadow-navy-900/8 sm:p-8">
-        <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-navy-800 via-gold-400 to-navy-800" />
+        <div className="absolute inset-x-0 top-0 h-1.5 bg-gold-500" />
 
         <div className="flex items-start gap-4">
-          <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-navy-800 to-navy-950 text-gold-400 shadow-lg">
+          <span className="grid size-12 shrink-0 place-items-center rounded-lg bg-navy-950 text-gold-400">
             <Search className="size-5.5" />
           </span>
           <div>
@@ -110,7 +110,7 @@ export function StatusTracker() {
           <Button
             type="submit"
             disabled={loading || !code.trim()}
-            className="h-12 min-w-[130px] rounded-xl bg-gradient-to-r from-navy-900 to-navy-800 font-extrabold text-white shadow-lg shadow-navy-900/25 transition-all hover:-translate-y-0.5 disabled:opacity-60"
+            className="h-12 min-w-[130px] rounded-lg bg-navy-950 font-bold text-white transition-colors hover:bg-navy-800 disabled:opacity-60"
           >
             {loading ? <Loader2 className="size-5 animate-spin" /> : <Search className="size-4.5" />}
             {loading ? "Checking…" : "Track"}

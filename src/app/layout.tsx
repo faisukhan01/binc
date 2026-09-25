@@ -1,30 +1,34 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit, Playfair_Display, Noto_Naskh_Arabic, Noto_Nastaliq_Urdu } from "next/font/google";
+import { Cormorant_Garamond, Figtree, Gulzar, Amiri } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { LangBoot } from "@/components/site/LangBoot";
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+const figtree = Figtree({
+  variable: "--font-figtree",
   subsets: ["latin"],
   display: "swap",
 });
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
   subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
-const notoNaskh = Noto_Naskh_Arabic({
-  variable: "--font-naskh",
+const amiri = Amiri({
+  variable: "--font-amiri",
   subsets: ["arabic"],
+  weight: ["400", "700"],
   display: "swap",
 });
 
-const notoNastaliq = Noto_Nastaliq_Urdu({
-  variable: "--font-nastaliq",
+const gulzar = Gulzar({
+  variable: "--font-gulzar",
   subsets: ["arabic"],
+  weight: "400",
   display: "swap",
 });
 
@@ -71,7 +75,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#071d49",
+  themeColor: "#05301f",
   width: "device-width",
   initialScale: 1,
 };
@@ -86,12 +90,12 @@ export default function RootLayout({
       lang="en"
       dir="ltr"
       suppressHydrationWarning
-      className={`${outfit.variable} ${playfair.variable} ${notoNaskh.variable} ${notoNastaliq.variable}`}
+      className={`${figtree.variable} ${cormorant.variable} ${amiri.variable} ${gulzar.variable}`}
     >
       <body className="antialiased bg-background text-foreground font-sans">
         <a
           href="#home"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-navy-950 focus:px-4 focus:py-2.5 focus:text-sm focus:font-bold focus:text-white focus:shadow-2xl"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-green-950 focus:px-4 focus:py-2.5 focus:text-sm focus:font-bold focus:text-white focus:shadow-2xl"
         >
           Skip to content
         </a>
