@@ -140,7 +140,7 @@ export function Footer() {
             </ul>
             <a
               href="#apply"
-              className="mt-5 inline-flex min-h-[46px] items-center rounded-lg bg-green-800 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-green-700"
+              className="mt-5 inline-flex min-h-[46px] items-center rounded-md bg-gold-500 px-5 py-2.5 text-sm font-bold text-green-950 transition-colors hover:bg-gold-400"
             >
               {isUr ? UR.footer.applyNow : "Apply Now — Fall 2026"}
             </a>

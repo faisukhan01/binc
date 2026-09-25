@@ -140,7 +140,7 @@ export function Navbar() {
               <LangToggle />
               <a
                 href="#apply"
-                className="hidden min-h-[44px] items-center rounded-lg bg-green-800 px-5 py-2.5 text-sm font-bold text-white transition-colors duration-200 hover:bg-green-700 sm:inline-flex"
+                className="hidden min-h-[44px] items-center rounded-md bg-green-950 px-5 py-2.5 text-sm font-bold text-white transition-colors duration-200 hover:bg-green-800 sm:inline-flex"
               >
                 {isUr ? UR.nav.applyNow : "Apply Now"}
               </a>
@@ -231,7 +231,7 @@ export function Navbar() {
                 <a
                   href="#apply"
                   onClick={() => setOpen(false)}
-                  className="flex min-h-[48px] items-center justify-center rounded-lg bg-green-800 px-5 py-3.5 text-base font-bold text-white"
+                  className="flex min-h-[48px] items-center justify-center rounded-md bg-green-950 px-5 py-3.5 text-base font-bold text-white"
                 >
                   {isUr ? UR.nav.drawerApply : "Apply Now — Fall 2026"}
                 </a>

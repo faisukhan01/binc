@@ -187,14 +187,15 @@ export function Contact() {
   }
 
   return (
-    <section id="contact" className="relative overflow-hidden bg-navy-50/60 py-20 sm:py-28">
-      <div className="pointer-events-none absolute -left-40 top-40 size-[420px] rounded-full bg-navy-100/50 blur-3xl" />
+    <section id="contact" className="bg-parchment py-20 sm:py-28">
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
         <SectionHeading
+          index="08"
+          align="left"
           kicker="Admissions & Contact"
           title={
             <>
-              Apply online — <span className="text-gradient-navy-red">secure your seat</span>
+              Apply online — <em className="not-italic text-green-700">secure your seat</em>
             </>
           }
           subtitle="Fill the online admission form and our admissions team will contact you the same day. Questions? Reach us on WhatsApp anytime."
@@ -204,15 +205,16 @@ export function Contact() {
           {/* Contact info column */}
           <div className="flex flex-col gap-6">
             <Reveal>
-              <div className="relative overflow-hidden rounded-3xl bg-navy-950 p-6 sm:p-8">
+              <div className="relative h-full overflow-hidden rounded-lg bg-green-950 p-6 sm:p-8">
                 <div
-                  className="absolute inset-0 opacity-[0.1]"
+                  aria-hidden
+                  className="absolute inset-0 opacity-[0.05]"
                   style={{
                     backgroundImage:
-                      "repeating-linear-gradient(-45deg, transparent 0 30px, rgba(255,215,90,.5) 30px 31px)",
+                      "repeating-linear-gradient(90deg, transparent 0 79px, rgba(255,255,255,.6) 79px 80px)",
                   }}
                 />
-                <h3 className="relative font-display text-2xl font-black text-white">
+                <h3 className="relative font-display text-2xl font-semibold text-white">
                   Admissions Office
                 </h3>
                 <p className="relative mt-1 text-sm text-navy-100/80">
@@ -226,13 +228,13 @@ export function Contact() {
                       href={line.href}
                       target={line.href.startsWith("http") ? "_blank" : undefined}
                       rel="noreferrer"
-                      className="group flex items-start gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 transition-all hover:border-gold-400/40 hover:bg-white/10"
+                      className="group flex items-start gap-4 rounded-lg border border-white/10 bg-white/5 p-4 transition-all hover:border-gold-400/40 hover:bg-white/10"
                     >
-                      <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-gold-500 text-green-950">
+                      <span className="grid size-11 shrink-0 place-items-center rounded-md bg-gold-500 text-green-950">
                         <line.icon className="size-5" />
                       </span>
                       <span className="min-w-0">
-                        <span className="block text-[10px] font-extrabold uppercase tracking-[0.2em] text-navy-100/60">
+                        <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-white/55">
                           {line.label}
                         </span>
                         <span className="mt-0.5 block text-sm font-bold text-white group-hover:text-gold-300 transition-colors break-words">
@@ -245,7 +247,7 @@ export function Contact() {
 
                 {/* Socials */}
                 <div className="relative mt-7">
-                  <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-navy-100/60">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/55">
                     Follow Bright International College
                   </p>
                   <div className="mt-3 flex gap-3">
@@ -260,9 +262,9 @@ export function Contact() {
                         target="_blank"
                         rel="noreferrer"
                         aria-label={`Follow us on ${s.label}`}
-                        className={`grid size-12 place-items-center rounded-xl bg-gradient-to-br ${s.grad} text-white shadow-lg transition-transform hover:-translate-y-1 hover:scale-105`}
+                        className={`grid size-11 place-items-center rounded-md bg-gradient-to-br ${s.grad} text-white shadow-md transition-transform hover:-translate-y-0.5 hover:scale-105`}
                       >
-                        <s.icon className="size-5.5" />
+                        <s.icon className="size-5" />
                       </a>
                     ))}
                   </div>
@@ -276,18 +278,18 @@ export function Contact() {
                 href={`https://wa.me/${SITE.whatsappIntl}`}
                 target="_blank"
                 rel="noreferrer"
-                className="group flex items-center justify-between rounded-2xl bg-welfare-700 p-6 transition-colors hover:bg-welfare-500"
+                className="group flex items-center justify-between rounded-lg bg-welfare-700 p-6 transition-colors hover:bg-welfare-600"
               >
                 <div>
-                  <p className="font-display text-xl font-black text-white">
+                  <p className="font-display text-xl font-semibold text-white">
                     Fastest reply? WhatsApp us
                   </p>
                   <p className="mt-0.5 text-sm font-semibold text-white/85">
                     {SITE.whatsapp} — admissions, fees & eligibility
                   </p>
                 </div>
-                <span className="grid size-14 shrink-0 place-items-center rounded-full bg-white shadow-lg transition-transform group-hover:scale-110">
-                  <svg viewBox="0 0 24 24" className="size-7 fill-welfare-500" aria-hidden>
+                <span className="grid size-13 shrink-0 place-items-center rounded-full bg-white p-3 shadow-md transition-transform group-hover:scale-105">
+                  <svg viewBox="0 0 24 24" className="size-6 fill-welfare-600" aria-hidden>
                     <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm5.83 14.12c-.25.7-1.45 1.33-2.02 1.42-.52.08-1.17.11-1.89-.12-.44-.14-1-.32-1.71-.63-3.02-1.3-4.99-4.34-5.14-4.54-.15-.2-1.23-1.63-1.23-3.11 0-1.48.78-2.21 1.05-2.51.28-.3.6-.38.8-.38.2 0 .4 0 .58.01.19.01.44-.07.68.52.25.6.85 2.07.92 2.22.08.15.13.33.02.53-.1.2-.15.32-.3.5-.15.17-.31.39-.45.52-.15.15-.3.31-.13.61.18.3.78 1.28 1.67 2.08 1.15 1.02 2.12 1.34 2.42 1.49.3.15.48.13.65-.08.18-.2.75-.87.95-1.17.2-.3.4-.25.68-.15.28.1 1.75.83 2.05.98.3.15.5.22.58.35.07.12.07.72-.18 1.42z" />
                   </svg>
                 </span>
@@ -299,7 +301,7 @@ export function Contact() {
           <Reveal delay={0.08}>
             <div
               id="apply"
-              className="relative overflow-hidden rounded-3xl border border-border bg-white p-6 shadow-2xl shadow-navy-900/10 sm:p-8"
+              className="relative overflow-hidden rounded-lg border border-line bg-white p-6 shadow-xl shadow-green-950/8 sm:p-8"
             >
               <div className="absolute inset-x-0 top-0 h-1.5 bg-gold-500" />
 
@@ -317,19 +319,19 @@ export function Contact() {
                   >
                     <CheckCircle2 className="size-11 text-welfare-500" />
                   </motion.span>
-                  <h3 className="mt-6 font-display text-3xl font-black text-navy-950">
+                  <h3 className="mt-6 font-display text-3xl font-semibold text-green-950">
                     Application Received! 🎓
                   </h3>
                   <p className="mt-3 max-w-sm text-muted-foreground">
                     Thank you for applying to Bright International College. Our
                     admissions team will call you shortly.
                   </p>
-                  <div className="mt-6 rounded-2xl border-2 border-dashed border-gold-500 bg-gold-300/15 px-6 py-4">
-                    <p className="text-[10px] font-extrabold uppercase tracking-[0.25em] text-muted-foreground">
+                  <div className="mt-6 rounded-lg border-2 border-dashed border-gold-500 bg-gold-300/15 px-6 py-4">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground">
                       Your Tracking Code
                     </p>
                     <div className="mt-1 flex items-center justify-center gap-3">
-                      <p className="font-display text-2xl font-black tracking-wide text-navy-950">
+                      <p className="font-display text-2xl font-semibold tracking-wide text-green-950">
                         {success.trackingCode}
                       </p>
                       <Button
@@ -370,14 +372,15 @@ export function Contact() {
                 <>
                   <div className="mb-6 flex items-center justify-between gap-3">
                     <div>
-                      <h3 className="font-display text-2xl font-black text-navy-950">
+                      <h3 className="font-display text-2xl font-semibold text-green-950">
                         Online Admission Form
                       </h3>
                       <p className="text-sm text-muted-foreground">
                         Fall 2026 · takes less than 2 minutes
                       </p>
                     </div>
-                    <span className="hidden sm:inline-flex items-center rounded-full bg-green-800/10 px-3.5 py-1.5 text-xs font-extrabold uppercase tracking-wider text-green-700">
+                    <span className="hidden sm:inline-flex items-center gap-1.5 rounded-md bg-green-800/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-green-800">
+                      <span className="size-1.5 rounded-full bg-green-700" aria-hidden />
                       Open Now
                     </span>
                   </div>
@@ -474,7 +477,7 @@ export function Contact() {
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="sm:col-span-2 min-h-[54px] rounded-lg bg-green-800 text-base font-bold transition-colors hover:bg-green-700 disabled:opacity-70"
+                      className="sm:col-span-2 min-h-[54px] rounded-md bg-green-950 text-base font-bold transition-colors hover:bg-green-800 disabled:opacity-70"
                     >
                       {isSubmitting ? (
                         <>
@@ -509,18 +512,19 @@ export function Contact() {
 function QuickHelp() {
   return (
     <Reveal delay={0.12}>
-      <div className="relative flex h-full flex-col overflow-hidden rounded-xl bg-navy-950 p-6 sm:p-8">
+      <div className="relative flex h-full flex-col overflow-hidden rounded-lg bg-green-950 p-6 sm:p-8">
         <div
-          className="absolute inset-0 opacity-[0.08]"
+          aria-hidden
+          className="absolute inset-0 opacity-[0.05]"
           style={{
             backgroundImage:
-              "repeating-linear-gradient(45deg, transparent 0 30px, rgba(255,215,90,.6) 30px 31px)",
+              "repeating-linear-gradient(90deg, transparent 0 79px, rgba(255,255,255,.6) 79px 80px)",
           }}
         />
-        <h3 className="relative font-display text-2xl font-black text-white">
+        <h3 className="relative font-display text-2xl font-semibold text-white">
           Admission Desk — We reply fast
         </h3>
-        <p className="relative mt-2 text-sm leading-relaxed text-navy-100/85">
+        <p className="relative mt-2 text-sm leading-relaxed text-white/75">
           Lost your tracking code? Need fee details, eligibility check or welfare
           verification? Our admissions office is one message away.
         </p>
@@ -530,7 +534,7 @@ function QuickHelp() {
             href={`https://wa.me/${SITE.whatsappIntl}?text=Hi! I need help with my admission application.`}
             target="_blank"
             rel="noreferrer"
-            className="flex min-h-[56px] items-center justify-between rounded-2xl bg-welfare-500 px-5 py-3.5 font-extrabold text-white shadow-lg shadow-welfare-900/30 transition-transform hover:-translate-y-0.5"
+            className="flex min-h-[56px] items-center justify-between rounded-md bg-welfare-600 px-5 py-3.5 font-bold text-white transition-colors hover:bg-welfare-500"
           >
             <span className="flex items-center gap-2.5">
               <svg viewBox="0 0 24 24" className="size-6 fill-white" aria-hidden>
@@ -542,17 +546,17 @@ function QuickHelp() {
           </a>
           <a
             href={`tel:${SITE.phone}`}
-            className="flex min-h-[56px] items-center justify-between rounded-2xl border border-white/15 bg-white/8 px-5 py-3.5 font-extrabold text-white transition-colors hover:bg-white/15"
+            className="flex min-h-[56px] items-center justify-between rounded-md border border-white/15 bg-white/5 px-5 py-3.5 font-bold text-white transition-colors hover:bg-white/10"
           >
             <span className="flex items-center gap-2.5">
               <Phone className="size-5 text-gold-400" /> Call Campus Office
             </span>
             <span className="font-display">{SITE.phone}</span>
           </a>
-          <div className="mt-1 flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-navy-100/60">
-            <span className="size-1.5 rounded-full bg-welfare-500" />
+          <div className="mt-1 flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">
+            <span className="size-1.5 rounded-full bg-gold-400" />
             Mon – Sat · 9:00 AM – 5:00 PM
-            <span className="size-1.5 rounded-full bg-welfare-500" />
+            <span className="size-1.5 rounded-full bg-gold-400" />
           </div>
         </div>
       </div>

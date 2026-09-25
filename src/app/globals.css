@@ -33,7 +33,8 @@
   --color-navy-100: var(--color-green-100);
   --color-navy-50: var(--color-green-50);
 
-  /* Heritage crimson — used sparingly (warning chips, tiny accents) */
+  /* Heritage crimson — semantic use ONLY (destructive, admin states).
+     Public marketing surfaces must not use red. */
   --color-brand-red: #c71920;
   --color-brand-redlight: #e0202d;
 
@@ -41,6 +42,12 @@
   --color-gold-500: #c9a227;
   --color-gold-400: #e0c168;
   --color-gold-300: #eedca0;
+
+  /* Editorial paper tones — warm ivory banding between white sections */
+  --color-paper: #faf9f4;
+  --color-parchment: #f3f0e7;
+  --color-line: #e7e2d4;
+  --color-line-dark: rgba(255, 255, 255, 0.12);
 
   /* WhatsApp green (semantic only) */
   --color-welfare-900: #07331f;
@@ -94,8 +101,8 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: #fbfaf8;
+  --radius: 0.375rem;
+  --background: #faf9f4;
   --foreground: #16211d;
   --card: #ffffff;
   --card-foreground: #16211d;
@@ -110,8 +117,8 @@
   --accent: #eff6f2;
   --accent-foreground: #05301f;
   --destructive: #c71920;
-  --border: #e6e6de;
-  --input: #d2d6cf;
+  --border: #e7e2d4;
+  --input: #d5d1c2;
   --ring: #0c5d3d;
 }
 
@@ -130,7 +137,11 @@
     color: #032117;
   }
   h1, h2, h3 {
-    letter-spacing: -0.005em;
+    letter-spacing: -0.01em;
+  }
+  /* Editorial display defaults — serif headings feel set like a prospectus */
+  .font-display {
+    font-feature-settings: "liga" 1, "kern" 1;
   }
 }
 
@@ -161,8 +172,17 @@ section[id] {
   color: #e0c168;
 }
 
-@utility text-gradient-navy-red {
-  color: #094a30;
+/* Small-caps editorial kicker used by SectionHeading */
+@utility kicker-caps {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+}
+
+/* Card shine removed in editorial redesign — keep class as no-op for safety */
+.card-shine {
+  position: relative;
 }
 
 @utility glass-nav {

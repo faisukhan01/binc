@@ -29,13 +29,13 @@ interface DisplayItem {
   live: boolean;
 }
 
-/** Gradient per name so initials avatars stay visually varied but deterministic */
+/** Ink & gold tones so avatars stay within the design system */
 const AVATAR_TONES = [
-  "from-navy-700 to-navy-950",
-  "from-brand-red to-red-800",
-  "from-welfare-600 to-welfare-800",
+  "from-green-700 to-green-950",
+  "from-green-800 to-green-950",
   "from-gold-500 to-gold-700",
-  "from-navy-500 to-brand-red",
+  "from-green-600 to-green-900",
+  "from-gold-600 to-green-900",
 ];
 
 function initials(name: string): string {
@@ -124,35 +124,29 @@ export function Testimonials() {
   return (
     <section
       aria-label="Student testimonials"
-      className="relative overflow-hidden bg-navy-50/60 py-20 sm:py-28"
+      className="relative overflow-hidden bg-parchment py-20 sm:py-28"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage:
-            "radial-gradient(ellipse 55% 60% at 50% 100%, rgba(20,64,143,0.07), transparent)",
-        }}
-      />
       <div className="relative mx-auto max-w-4xl px-4 sm:px-6">
         <SectionHeading
+          index="06"
           kicker="Student Voices"
           title={
             <>
-              Stories from our <span className="text-green-700">Bright family</span>
+              Stories from our <em className="not-italic text-green-700">Bright family</em>
             </>
           }
         />
 
         <div className="relative">
           <Quote
-            className="absolute -top-6 left-1/2 size-20 -translate-x-1/2 text-navy-100"
+            className="absolute -top-6 left-1/2 size-20 -translate-x-1/2 text-line"
             aria-hidden
           />
           {live === null && showSkeleton ? (
             <div
-              className="relative mx-auto max-w-2xl rounded-3xl border border-border bg-white p-8 shadow-xl shadow-navy-900/8 sm:p-10"
+              className="relative mx-auto max-w-2xl rounded-lg border border-line bg-white p-8 shadow-lg shadow-green-950/5 sm:p-10"
               aria-hidden
               role="presentation"
             >
@@ -179,11 +173,11 @@ export function Testimonials() {
             <AnimatePresence mode="wait">
               <motion.figure
                 key={item.id}
-                initial={{ opacity: 0, y: 28, scale: 0.98 }}
+                initial={{ opacity: 0, y: 20, scale: 0.99 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -20, scale: 0.98 }}
+                exit={{ opacity: 0, y: -14, scale: 0.99 }}
                 transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                className="relative rounded-3xl border border-border bg-white p-8 text-center shadow-xl shadow-navy-900/8 sm:p-10"
+                className="relative rounded-lg border border-line bg-white p-8 text-center shadow-lg shadow-green-950/5 sm:p-10"
               >
                 <div className="flex justify-center gap-1" aria-label={`${item.rating} out of 5 stars`}>
                   {Array.from({ length: item.rating }).map((_, i) => (
@@ -204,7 +198,7 @@ export function Testimonials() {
                     <span
                       aria-hidden
                       className={cn(
-                        "grid size-12 shrink-0 place-items-center rounded-full bg-gradient-to-br font-display text-sm font-black text-white shadow-md ring-2 ring-white",
+                        "grid size-12 shrink-0 place-items-center rounded-full bg-gradient-to-br font-display text-sm font-bold text-white shadow-md ring-2 ring-white",
                         toneFor(item.name)
                       )}
                     >
@@ -238,7 +232,7 @@ export function Testimonials() {
             <button
               onClick={prev}
               aria-label="Previous testimonial"
-              className="grid size-11 place-items-center rounded-full border border-navy-100 bg-white text-navy-900 shadow-sm transition-all hover:bg-navy-950 hover:text-white"
+              className="grid size-11 place-items-center rounded-full border border-line bg-white text-green-950 shadow-sm transition-all hover:bg-green-950 hover:text-white"
             >
               <ChevronLeft className="size-5" />
             </button>
@@ -254,7 +248,7 @@ export function Testimonials() {
                     "h-2.5 rounded-full transition-all duration-300",
                     i === activeIndex
                       ? "w-8 bg-gold-500"
-                      : "w-2.5 bg-navy-200 hover:bg-navy-300"
+                      : "w-2.5 bg-line hover:bg-gold-400"
                   )}
                 />
               ))}
@@ -262,7 +256,7 @@ export function Testimonials() {
             <button
               onClick={next}
               aria-label="Next testimonial"
-              className="grid size-11 place-items-center rounded-full border border-navy-100 bg-white text-navy-900 shadow-sm transition-all hover:bg-navy-950 hover:text-white"
+              className="grid size-11 place-items-center rounded-full border border-line bg-white text-green-950 shadow-sm transition-all hover:bg-green-950 hover:text-white"
             >
               <ChevronRight className="size-5" />
             </button>

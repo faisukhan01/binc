@@ -48,7 +48,7 @@ export const PROGRAMS: Program[] = [
       "Licensed pharmacy career pathway",
     ],
     careers: ["Community Pharmacist", "Hospital Pharmacist", "Pharma Industry", "Research"],
-    accent: "from-navy-800 to-navy-950",
+    accent: "from-green-800 to-green-950",
     overview:
       "Pharm-D is a five-year professional doctorate that trains you to become a licensed pharmacy professional — from the science behind medicines to hands-on patient care in hospitals and community pharmacies.",
     eligibility: [
@@ -78,7 +78,7 @@ export const PROGRAMS: Program[] = [
       "Hospital internship exposure",
     ],
     careers: ["Clinical DPT", "Sports Rehab", "Rehab Centers", "Private Practice"],
-    accent: "from-brand-red to-navy-900",
+    accent: "from-green-900 to-green-800",
     overview:
       "DPT is a five-year clinical doctorate focused on physical rehabilitation — you learn to assess, diagnose and treat movement disorders through evidence-based therapy in hospitals, sports settings and private practice.",
     eligibility: [
@@ -108,7 +108,7 @@ export const PROGRAMS: Program[] = [
       "Startup & industry mentorship",
     ],
     careers: ["Software Engineer", "AI / Data Science", "Cyber Security", "Entrepreneurship"],
-    accent: "from-navy-900 via-navy-800 to-brand-red",
+    accent: "from-green-950 via-green-800 to-gold-600",
     overview:
       "BSCS is a four-year computing degree built around real-world projects — from programming fundamentals to modern AI and data science, with mentorship that prepares you for jobs, freelancing or your own startup.",
     eligibility: [

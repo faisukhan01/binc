@@ -91,11 +91,11 @@ export function ProgramModal({ program, onClose }: Props) {
                   <p className="text-sm font-bold text-navy-100/95">{program.full}</p>
                 </div>
                 <div className="flex gap-2">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-extrabold text-navy-900 shadow-lg backdrop-blur">
-                    <Clock3 className="size-3.5 text-brand-red" />
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-green-950 shadow-lg backdrop-blur">
+                    <Clock3 className="size-3.5 text-gold-600" />
                     {program.duration}
                   </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-gold-400 px-3 py-1.5 text-xs font-extrabold text-navy-950 shadow-lg">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-gold-400 px-3 py-1.5 text-xs font-bold text-green-950 shadow-lg">
                     <CalendarDays className="size-3.5" />
                     Fall 2026
                   </span>
@@ -125,16 +125,16 @@ export function ProgramModal({ program, onClose }: Props) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.14 }}
               >
-                <h4 className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.22em] text-navy-900">
-                  <GraduationCap className="size-4 text-brand-red" /> Who can apply
+                <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-green-950">
+                  <GraduationCap className="size-4 text-gold-600" /> Who can apply
                 </h4>
                 <ul className="mt-3 space-y-2">
                   {program.eligibility.map((e) => (
                     <li
                       key={e}
-                      className="flex items-start gap-2.5 rounded-xl bg-navy-50 px-3.5 py-2.5 text-sm font-semibold text-navy-900"
+                      className="flex items-start gap-2.5 rounded-lg bg-paper px-3.5 py-2.5 text-sm font-semibold text-green-950 ring-1 ring-line"
                     >
-                      <BadgeCheck className="mt-0.5 size-4 shrink-0 text-welfare-500" />
+                      <BadgeCheck className="mt-0.5 size-4 shrink-0 text-gold-600" />
                       {e}
                     </li>
                   ))}
@@ -147,10 +147,10 @@ export function ProgramModal({ program, onClose }: Props) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <h4 className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.22em] text-navy-900">
-                  <Route className="size-4 text-brand-red" /> Your {program.years}-year journey
+                <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-green-950">
+                  <Route className="size-4 text-gold-600" /> Your {program.years}-year journey
                 </h4>
-                <ol className="relative mt-3 space-y-0 border-l-2 border-dashed border-navy-100 pl-5">
+                <ol className="relative mt-3 space-y-0 border-l-2 border-dashed border-line pl-5">
                   {program.curriculum.map((c, i) => (
                     <motion.li
                       key={c.year}
@@ -159,10 +159,10 @@ export function ProgramModal({ program, onClose }: Props) {
                       transition={{ delay: 0.24 + i * 0.06 }}
                       className="relative pb-3.5 last:pb-0"
                     >
-                      <span className="absolute -left-[27px] top-0.5 grid size-5 place-items-center rounded-full bg-green-700 ring-4 ring-white">
+                      <span className="absolute -left-[27px] top-0.5 grid size-5 place-items-center rounded-full bg-green-800 ring-4 ring-white">
                         <span className="size-1.5 rounded-full bg-white" />
                       </span>
-                      <p className="text-xs font-extrabold uppercase tracking-wider text-brand-red">
+                      <p className="text-xs font-bold uppercase tracking-wider text-gold-600">
                         {c.year}
                       </p>
                       <p className="text-sm text-muted-foreground">{c.focus}</p>
@@ -177,14 +177,14 @@ export function ProgramModal({ program, onClose }: Props) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.28 }}
               >
-                <h4 className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.22em] text-navy-900">
-                  <BadgeCheck className="size-4 text-brand-red" /> Career pathways
+                <h4 className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-green-950">
+                  <BadgeCheck className="size-4 text-gold-600" /> Career pathways
                 </h4>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {program.careers.map((c) => (
                     <span
                       key={c}
-                      className="rounded-full border border-navy-100 bg-white px-3.5 py-1.5 text-xs font-bold text-navy-800 shadow-sm"
+                      className="rounded-full border border-line bg-paper px-3.5 py-1.5 text-xs font-semibold text-green-900"
                     >
                       {c}
                     </span>
@@ -201,7 +201,7 @@ export function ProgramModal({ program, onClose }: Props) {
               >
                 <button
                   onClick={() => applyToProgram(program)}
-                  className="group inline-flex min-h-[52px] items-center justify-center gap-2 rounded-lg bg-green-800 px-6 py-3.5 text-base font-bold text-white transition-colors hover:bg-green-700"
+                  className="group inline-flex min-h-[52px] items-center justify-center gap-2 rounded-md bg-green-950 px-6 py-3.5 text-base font-bold text-white transition-colors hover:bg-green-800"
                 >
                   Apply for {program.title}
                   <ChevronRight className="size-5 transition-transform duration-300 group-hover:translate-x-1" />
@@ -212,7 +212,7 @@ export function ProgramModal({ program, onClose }: Props) {
                   )}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex min-h-[52px] items-center justify-center rounded-2xl border-2 border-welfare-500/60 px-5 py-3 text-sm font-extrabold text-welfare-700 transition-all hover:bg-welfare-500 hover:text-white"
+                  className="inline-flex min-h-[52px] items-center justify-center rounded-md border-2 border-welfare-600/60 px-5 py-3 text-sm font-bold text-welfare-700 transition-all hover:bg-welfare-600 hover:text-white"
                 >
                   Ask on WhatsApp
                 </a>

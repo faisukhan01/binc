@@ -10,15 +10,15 @@ interface RevealProps {
   once?: boolean;
 }
 
-/** Scroll-triggered reveal wrapper (fade + rise). */
-export function Reveal({ children, delay = 0, y = 36, className, once = true }: RevealProps) {
+/** Scroll-triggered reveal wrapper (fade + gentle rise). */
+export function Reveal({ children, delay = 0, y = 24, className, once = true }: RevealProps) {
   return (
     <motion.div
       className={className}
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once, margin: "-60px" }}
-      transition={{ duration: 0.75, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>
@@ -31,43 +31,62 @@ interface SectionHeadingProps {
   subtitle?: string;
   dark?: boolean;
   align?: "center" | "left";
+  /** Editorial index e.g. "01" — set as a large ghost numeral beside the kicker */
+  index?: string;
 }
 
+/**
+ * Editorial section heading — small-caps kicker over a hairline rule,
+ * oversized serif title. No pills, no chips, no chrome.
+ */
 export function SectionHeading({
   kicker,
   title,
   subtitle,
   dark = false,
   align = "center",
+  index,
 }: SectionHeadingProps) {
   return (
     <Reveal
       className={`mb-12 sm:mb-16 ${
         align === "center" ? "text-center mx-auto" : "text-start"
-      } max-w-2xl`}
+      } max-w-3xl`}
     >
-      <p
-        className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-extrabold uppercase tracking-[0.25em] ${
-          dark
-            ? "bg-white/10 text-gold-400 border border-white/15"
-            : "bg-navy-50 text-green-700 border border-navy-100"
-        }`}
+      {/* Kicker row — hairline rule + small caps (+ optional ghost index) */}
+      <div
+        className={`flex items-center gap-4 ${align === "center" ? "justify-center" : "justify-start"}`}
       >
-        <span className="size-1.5 rounded-full bg-current" />
-        {kicker}
-      </p>
+        {index && (
+          <span
+            aria-hidden
+            className={`font-display text-sm font-semibold tracking-[0.2em] ${
+              dark ? "text-gold-400/80" : "text-gold-600"
+            }`}
+          >
+            {index}
+          </span>
+        )}
+        <span aria-hidden className={`h-px w-10 ${dark ? "bg-white/30" : "bg-gold-500/70"}`} />
+        <p className={`kicker-caps ${dark ? "text-gold-400" : "text-gold-600"}`}>{kicker}</p>
+        <span
+          aria-hidden
+          className={`hidden h-px w-24 sm:block ${dark ? "bg-white/15" : "bg-line"}`}
+        />
+      </div>
+
       <h2
-        className={`mt-4 font-display text-3xl sm:text-4xl lg:text-[2.75rem] font-black leading-tight tracking-tight ${
-          dark ? "text-white" : "text-navy-900"
+        className={`mt-5 font-display text-[2rem] sm:text-4xl lg:text-[2.9rem] font-semibold leading-[1.08] ${
+          dark ? "text-white" : "text-green-950"
         }`}
       >
         {title}
       </h2>
       {subtitle && (
         <p
-          className={`mt-3.5 text-base sm:text-lg leading-relaxed ${
-            dark ? "text-navy-100/85" : "text-muted-foreground"
-          }`}
+          className={`mt-4 text-base sm:text-lg leading-relaxed ${
+            dark ? "text-navy-100/80" : "text-muted-foreground"
+          } ${align === "center" ? "mx-auto max-w-2xl" : "max-w-2xl"}`}
         >
           {subtitle}
         </p>

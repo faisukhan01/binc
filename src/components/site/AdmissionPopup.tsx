@@ -125,13 +125,13 @@ export function AdmissionPopup() {
                     <p className="text-sm font-bold text-navy-900">{isUr ? UR.popup.sessionValue : "September 2026"}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2.5 rounded-lg border border-brand-red/15 bg-brand-red/[0.05] px-3.5 py-3">
-                  <Clock3 className="size-5 shrink-0 text-brand-red" />
+                <div className="flex items-center gap-2.5 rounded-lg border border-gold-500/30 bg-gold-400/[0.08] px-3.5 py-3">
+                  <Clock3 className="size-5 shrink-0 text-gold-600" />
                   <div className="leading-tight">
                     <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       {isUr ? UR.popup.seatsLabel : "Limited Seats"}
                     </p>
-                    <p className="text-sm font-bold text-brand-red">{isUr ? UR.popup.seatsValue : "First Come Basis"}</p>
+                    <p className="text-sm font-bold text-gold-600">{isUr ? UR.popup.seatsValue : "First Come Basis"}</p>
                   </div>
                 </div>
               </div>

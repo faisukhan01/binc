@@ -79,7 +79,7 @@ export function StatusTracker() {
 
   return (
     <Reveal delay={0.05}>
-      <div className="relative overflow-hidden rounded-3xl border border-border bg-white p-6 shadow-xl shadow-navy-900/8 sm:p-8">
+      <div className="relative overflow-hidden rounded-lg border border-line bg-white p-6 shadow-lg shadow-green-950/5 sm:p-8">
         <div className="absolute inset-x-0 top-0 h-1.5 bg-gold-500" />
 
         <div className="flex items-start gap-4">
@@ -87,7 +87,7 @@ export function StatusTracker() {
             <Search className="size-5.5" />
           </span>
           <div>
-            <h3 className="font-display text-xl font-black text-navy-950 sm:text-2xl">
+            <h3 className="font-display text-xl font-semibold text-green-950 sm:text-2xl">
               Track Your Application
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -110,7 +110,7 @@ export function StatusTracker() {
           <Button
             type="submit"
             disabled={loading || !code.trim()}
-            className="h-12 min-w-[130px] rounded-lg bg-navy-950 font-bold text-white transition-colors hover:bg-navy-800 disabled:opacity-60"
+            className="h-12 min-w-[130px] rounded-md bg-green-950 font-bold text-white transition-colors hover:bg-green-800 disabled:opacity-60"
           >
             {loading ? <Loader2 className="size-5 animate-spin" /> : <Search className="size-4.5" />}
             {loading ? "Checking…" : "Track"}
